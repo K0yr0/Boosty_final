@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -42,9 +41,131 @@ const AINotesPage: React.FC = () => {
         },
       ],
     },
+    week4: {
+      title: 'Week 4: Arrays & Loops',
+      confusionPeaks: [
+        { topic: 'Nested loops', percentage: 65 },
+        { topic: 'Array indexing', percentage: 45 },
+      ],
+      strongUnderstanding: [
+        { topic: 'For loops', percentage: 88 },
+        { topic: 'Array declaration', percentage: 82 },
+      ],
+      summary: [
+        'Arrays store multiple values in a single variable',
+        'Loops allow repeated execution of code blocks',
+        'Array indexing starts at 0 in most programming languages',
+        'Nested loops are useful for 2D data structures',
+      ],
+      flashcards: [
+        {
+          question: 'What is the first index of an array?',
+          answer: 'The first index of an array is 0.',
+        },
+        {
+          question: 'What is a nested loop?',
+          answer: 'A loop inside another loop, often used for processing 2D arrays.',
+        },
+      ],
+    },
+    week3: {
+      title: 'Week 3: Functions',
+      confusionPeaks: [
+        { topic: 'Return statements', percentage: 58 },
+        { topic: 'Function parameters', percentage: 42 },
+      ],
+      strongUnderstanding: [
+        { topic: 'Function calls', percentage: 85 },
+        { topic: 'Function naming', percentage: 79 },
+      ],
+      summary: [
+        'Functions are reusable blocks of code',
+        'Functions can accept parameters and return values',
+        'Good function names describe what the function does',
+        'Functions help organize code and reduce repetition',
+      ],
+      flashcards: [
+        {
+          question: 'What is a function parameter?',
+          answer: 'A variable that receives a value when the function is called.',
+        },
+        {
+          question: 'What does a return statement do?',
+          answer: 'It sends a value back to the code that called the function.',
+        },
+      ],
+    },
+    week2: {
+      title: 'Week 2: Variables',
+      confusionPeaks: [
+        { topic: 'Variable scope', percentage: 67 },
+        { topic: 'Data types', percentage: 52 },
+      ],
+      strongUnderstanding: [
+        { topic: 'Variable declaration', percentage: 91 },
+        { topic: 'Variable assignment', percentage: 87 },
+      ],
+      summary: [
+        'Variables store data values in memory',
+        'Different data types serve different purposes',
+        'Variable scope determines where variables can be accessed',
+        'Good variable names make code more readable',
+      ],
+      flashcards: [
+        {
+          question: 'What is variable scope?',
+          answer: 'The region of code where a variable can be accessed.',
+        },
+        {
+          question: 'Name three common data types',
+          answer: 'Integer, string, and boolean.',
+        },
+      ],
+    },
+    week1: {
+      title: 'Week 1: Introduction',
+      confusionPeaks: [
+        { topic: 'Programming concepts', percentage: 78 },
+        { topic: 'IDE setup', percentage: 61 },
+      ],
+      strongUnderstanding: [
+        { topic: 'Basic syntax', percentage: 73 },
+        { topic: 'Hello World', percentage: 95 },
+      ],
+      summary: [
+        'Programming is giving instructions to computers',
+        'IDEs provide tools to write and run code',
+        'Syntax rules must be followed for code to work',
+        'Every programmer starts with "Hello World"',
+      ],
+      flashcards: [
+        {
+          question: 'What is an IDE?',
+          answer: 'Integrated Development Environment - software for writing and debugging code.',
+        },
+        {
+          question: 'What is syntax in programming?',
+          answer: 'The set of rules that define valid code structure in a programming language.',
+        },
+      ],
+    },
   };
 
   const currentNotes = notesData[selectedWeek as keyof typeof notesData];
+
+  // Add fallback for when data doesn't exist
+  if (!currentNotes) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-[#2c2c2c]">AI Notes & Highlights</h2>
+        </div>
+        <Card className="p-6 bg-white text-center">
+          <p className="text-[#666]">No data available for the selected week.</p>
+        </Card>
+      </div>
+    );
+  }
 
   const handleDownload = () => {
     toast({
