@@ -2,42 +2,14 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Users, Timer, Trophy, Play, Pause, RotateCcw } from 'lucide-react';
+import { Users, Clock, Play, Pause, BarChart, MessageCircle } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 const StudySquads: React.FC = () => {
-  const [activeSquad, setActiveSquad] = useState<string | null>(null);
+  const [selectedSquad, setSelectedSquad] = useState<number | null>(null);
   const [pomodoroTime, setPomodoroTime] = useState(25 * 60); // 25 minutes in seconds
   const [isRunning, setIsRunning] = useState(false);
-  const [isBreak, setIsBreak] = useState(false);
-
-  const squads = [
-    {
-      id: 'cs101',
-      name: 'CS101 Study Squad',
-      course: 'Introduction to Computer Science',
-      members: [
-        { name: 'Kayra', status: 'studying', progress: 85 },
-        { name: 'Irmak', status: 'studying', progress: 72 },
-        { name: 'Mehmet', status: 'break', progress: 90 },
-        { name: 'Ayşe', status: 'offline', progress: 45 },
-      ],
-      totalMembers: 8,
-      activeMembers: 3,
-    },
-    {
-      id: 'math201',
-      name: 'Math201 Focus Group',
-      course: 'Calculus II',
-      members: [
-        { name: 'Ali', status: 'studying', progress: 95 },
-        { name: 'Zeynep', status: 'studying', progress: 78 },
-        { name: 'Can', status: 'studying', progress: 82 },
-      ],
-      totalMembers: 6,
-      activeMembers: 3,
-    },
-  ];
+  const [currentCycle, setCurrentCycle] = useState(1);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -46,25 +18,49 @@ const StudySquads: React.FC = () => {
         setPomodoroTime(time => time - 1);
       }, 1000);
     } else if (pomodoroTime === 0) {
+      toast({
+        title: 'Pomodoro Complete!',
+        description: 'Great job! Take a 5-minute break.',
+      });
       setIsRunning(false);
-      if (isBreak) {
-        toast({
-          title: 'Break Complete!',
-          description: 'Ready for another focus session?',
-        });
-        setPomodoroTime(25 * 60);
-        setIsBreak(false);
-      } else {
-        toast({
-          title: 'Pomodoro Complete!',
-          description: 'Great job! Time for a break.',
-        });
-        setPomodoroTime(5 * 60);
-        setIsBreak(true);
-      }
+      setPomodoroTime(25 * 60);
+      setCurrentCycle(prev => prev + 1);
     }
     return () => clearInterval(interval);
-  }, [isRunning, pomodoroTime, isBreak]);
+  }, [isRunning, pomodoroTime]);
+
+  const squads = [
+    {
+      id: 1,
+      name: 'CS101 Focus Group',
+      members: ['Kayra', 'Ada', 'James'],
+      activeNow: 2,
+      totalSessions: 15,
+      avgFocusTime: '45 min',
+      topic: 'Recursion Practice',
+      joined: true,
+    },
+    {
+      id: 2,
+      name: 'Algorithm Enthusiasts',
+      members: ['Sarah', 'Eylül', 'Mike', 'Lisa'],
+      activeNow: 3,
+      totalSessions: 28,
+      avgFocusTime: '52 min',
+      topic: 'Data Structures',
+      joined: false,
+    },
+    {
+      id: 3,
+      name: 'Programming Fundamentals',
+      members: ['Alex', 'Emma', 'David'],
+      activeNow: 1,
+      totalSessions: 8,
+      avgFocusTime: '38 min',
+      topic: 'Basic Concepts Review',
+      joined: false,
+    },
+  ];
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -72,179 +68,227 @@ const StudySquads: React.FC = () => {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const handleJoinSquad = (squadId: string) => {
-    setActiveSquad(squadId);
+  const handleJoinSquad = (squadId: number) => {
+    setSelectedSquad(squadId);
     toast({
       title: 'Joined Squad!',
-      description: 'You are now part of the silent study session',
+      description: 'You are now part of the study group. Start focusing!',
     });
   };
 
   const handleLeaveSquad = () => {
-    setActiveSquad(null);
+    setSelectedSquad(null);
     setIsRunning(false);
     setPomodoroTime(25 * 60);
-    setIsBreak(false);
     toast({
       title: 'Left Squad',
-      description: 'Study session ended',
+      description: 'You have left the study group.',
     });
   };
 
-  const togglePomodoro = () => {
-    setIsRunning(!isRunning);
+  const handleStartPomodoro = () => {
+    setIsRunning(true);
     toast({
-      title: isRunning ? 'Paused' : 'Started',
-      description: isRunning ? 'Timer paused' : 'Focus session started!',
+      title: 'Focus Session Started',
+      description: 'Stay focused for the next 25 minutes!',
     });
   };
 
-  const resetPomodoro = () => {
+  const handlePausePomodoro = () => {
     setIsRunning(false);
-    setPomodoroTime(25 * 60);
-    setIsBreak(false);
     toast({
-      title: 'Timer Reset',
-      description: 'Ready for a new focus session',
+      title: 'Session Paused',
+      description: 'Take a quick break and resume when ready.',
+    });
+  };
+
+  const handleTeamChat = () => {
+    toast({
+      title: 'Team Chat',
+      description: 'Opening team chat for quick coordination...',
+    });
+  };
+
+  const handleSeeProgress = () => {
+    toast({
+      title: 'Progress Report',
+      description: 'Viewing detailed study progress and statistics...',
     });
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-[#2c2c2c]">Silent Study Squads</h2>
-        {activeSquad && (
-          <Button
-            onClick={handleLeaveSquad}
-            variant="outline"
-            className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
-          >
-            Leave Squad
-          </Button>
-        )}
-      </div>
+      <h2 className="text-2xl font-bold text-[#2c2c2c]">Silent Study Squads</h2>
 
-      {/* Active Pomodoro Timer */}
-      {activeSquad && (
-        <Card className="p-6 bg-white">
-          <div className="text-center">
-            <h3 className="text-lg font-semibold text-[#2c2c2c] mb-4">
-              {isBreak ? 'Break Time' : 'Focus Session'}
-            </h3>
-            <div className="text-6xl font-bold text-[#8B4513] mb-6">
-              {formatTime(pomodoroTime)}
-            </div>
-            <div className="flex justify-center space-x-4">
+      {selectedSquad ? (
+        // Active Squad View
+        <div className="space-y-6">
+          <Card className="p-6 bg-white">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-semibold text-[#2c2c2c]">
+                {squads.find(s => s.id === selectedSquad)?.name}
+              </h3>
               <Button
-                onClick={togglePomodoro}
-                className="bg-[#8B4513] hover:bg-[#654321] text-white"
+                onClick={handleLeaveSquad}
+                variant="outline"
+                className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
               >
-                {isRunning ? <Pause className="w-4 h-4 mr-2" /> : <Play className="w-4 h-4 mr-2" />}
-                {isRunning ? 'Pause' : 'Start'}
+                Leave Squad
               </Button>
+            </div>
+            
+            <div className="grid grid-cols-3 gap-4 mb-6">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-[#8B4513]">
+                  {squads.find(s => s.id === selectedSquad)?.activeNow}
+                </div>
+                <div className="text-[#666]">Active Now</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-[#8B4513]">{currentCycle}</div>
+                <div className="text-[#666]">Cycles Today</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-[#8B4513]">
+                  {squads.find(s => s.id === selectedSquad)?.avgFocusTime}
+                </div>
+                <div className="text-[#666]">Avg Focus</div>
+              </div>
+            </div>
+
+            {/* Pomodoro Timer */}
+            <div className="text-center mb-6">
+              <div className="text-6xl font-bold text-[#8B4513] mb-4">
+                {formatTime(pomodoroTime)}
+              </div>
+              <div className="flex justify-center space-x-4">
+                {!isRunning ? (
+                  <Button
+                    onClick={handleStartPomodoro}
+                    className="bg-green-500 hover:bg-green-600 text-white"
+                  >
+                    <Play className="w-5 h-5 mr-2" />
+                    Start Focus
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={handlePausePomodoro}
+                    className="bg-yellow-500 hover:bg-yellow-600 text-white"
+                  >
+                    <Pause className="w-5 h-5 mr-2" />
+                    Pause
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="grid grid-cols-2 gap-4">
               <Button
-                onClick={resetPomodoro}
+                onClick={handleTeamChat}
                 variant="outline"
                 className="border-[#8B4513] text-[#8B4513] hover:bg-[#8B4513] hover:text-white"
               >
-                <RotateCcw className="w-4 h-4 mr-2" />
-                Reset
+                <MessageCircle className="w-4 h-4 mr-2" />
+                Team Chat
+              </Button>
+              <Button
+                onClick={handleSeeProgress}
+                variant="outline"
+                className="border-[#8B4513] text-[#8B4513] hover:bg-[#8B4513] hover:text-white"
+              >
+                <BarChart className="w-4 h-4 mr-2" />
+                See Progress
               </Button>
             </div>
-          </div>
-        </Card>
-      )}
+          </Card>
 
-      {/* Available Squads */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {squads.map((squad) => (
-          <Card key={squad.id} className="p-6 bg-white">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h3 className="text-lg font-semibold text-[#2c2c2c]">{squad.name}</h3>
-                <p className="text-[#666]">{squad.course}</p>
-              </div>
-              <div className="text-right">
-                <div className="flex items-center text-[#8B4513]">
-                  <Users className="w-4 h-4 mr-1" />
-                  <span className="font-semibold">{squad.activeMembers}/{squad.totalMembers}</span>
-                </div>
-                <span className="text-[#666] text-sm">Active Members</span>
-              </div>
-            </div>
-
-            {/* Member Progress */}
-            <div className="space-y-3 mb-4">
-              {squad.members.map((member, index) => (
-                <div key={index} className="flex items-center justify-between">
+          {/* Live Activity */}
+          <Card className="p-6 bg-white">
+            <h3 className="text-lg font-semibold text-[#2c2c2c] mb-4">Live Squad Activity</h3>
+            <div className="space-y-3">
+              {squads.find(s => s.id === selectedSquad)?.members.map((member, index) => (
+                <div key={index} className="flex items-center justify-between p-3 bg-[#fff3e6] rounded-lg">
                   <div className="flex items-center">
-                    <div className={`w-3 h-3 rounded-full mr-2 ${
-                      member.status === 'studying' ? 'bg-green-500' :
-                      member.status === 'break' ? 'bg-yellow-500' : 'bg-gray-400'
-                    }`} />
-                    <span className="text-[#2c2c2c] font-medium">{member.name}</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-20 bg-gray-200 rounded-full h-2">
-                      <div 
-                        className="bg-[#8B4513] h-2 rounded-full transition-all duration-300"
-                        style={{ width: `${member.progress}%` }}
-                      />
+                    <div className="w-8 h-8 bg-[#8B4513] rounded-full flex items-center justify-center mr-3">
+                      <span className="text-white text-sm">{member[0]}</span>
                     </div>
-                    <span className="text-[#666] text-sm w-10">{member.progress}%</span>
+                    <span className="text-[#2c2c2c]">{member}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <div className="w-2 h-2 bg-green-500 rounded-full mr-2" />
+                    <span className="text-[#666] text-sm">
+                      {index < 2 ? 'Focusing' : 'Break'}
+                    </span>
                   </div>
                 </div>
               ))}
             </div>
+          </Card>
+        </div>
+      ) : (
+        // Squad Selection View
+        <div className="space-y-6">
+          <Card className="p-6 bg-white">
+            <h3 className="text-lg font-semibold text-[#2c2c2c] mb-4">Available Study Squads</h3>
+            <p className="text-[#666] mb-4">
+              Join a silent study group to stay focused and motivated with your classmates.
+            </p>
+          </Card>
 
-            {/* Squad Actions */}
-            <div className="pt-4 border-t border-[#e0e0e0]">
-              {activeSquad === squad.id ? (
-                <div className="flex items-center justify-center text-green-600">
-                  <Users className="w-4 h-4 mr-2" />
-                  <span className="font-medium">Currently Active</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {squads.map((squad) => (
+              <Card key={squad.id} className="p-6 bg-white">
+                <div className="mb-4">
+                  <h3 className="text-lg font-semibold text-[#2c2c2c] mb-2">
+                    {squad.name}
+                  </h3>
+                  <p className="text-[#666] text-sm mb-3">{squad.topic}</p>
+                  
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-[#666]">Members:</span>
+                      <span className="text-[#2c2c2c]">{squad.members.length}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-[#666]">Active now:</span>
+                      <span className="text-green-600 font-semibold">{squad.activeNow}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-[#666]">Sessions:</span>
+                      <span className="text-[#2c2c2c]">{squad.totalSessions}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-[#666]">Avg Focus:</span>
+                      <span className="text-[#2c2c2c]">{squad.avgFocusTime}</span>
+                    </div>
+                  </div>
                 </div>
-              ) : (
+
+                <div className="mb-4">
+                  <h4 className="text-sm font-medium text-[#2c2c2c] mb-2">Members:</h4>
+                  <div className="flex flex-wrap gap-1">
+                    {squad.members.map((member, index) => (
+                      <span key={index} className="px-2 py-1 bg-[#fff3e6] text-[#8B4513] text-xs rounded">
+                        {member}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
                 <Button
                   onClick={() => handleJoinSquad(squad.id)}
-                  disabled={!!activeSquad}
                   className="w-full bg-[#8B4513] hover:bg-[#654321] text-white"
+                  disabled={squad.joined}
                 >
                   <Users className="w-4 h-4 mr-2" />
-                  Join Squad
+                  {squad.joined ? 'Already Joined' : 'Join Squad'}
                 </Button>
-              )}
-            </div>
-          </Card>
-        ))}
-      </div>
-
-      {/* Squad Stats */}
-      <Card className="p-6 bg-white">
-        <h3 className="text-lg font-semibold text-[#2c2c2c] mb-4">Your Squad Achievements</h3>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="text-center">
-            <Trophy className="w-8 h-8 text-yellow-500 mx-auto mb-2" />
-            <div className="text-2xl font-bold text-[#8B4513]">45</div>
-            <div className="text-[#666]">Pomodoros Completed</div>
-          </div>
-          <div className="text-center">
-            <Timer className="w-8 h-8 text-blue-500 mx-auto mb-2" />
-            <div className="text-2xl font-bold text-[#8B4513]">18.5</div>
-            <div className="text-[#666]">Hours This Week</div>
-          </div>
-          <div className="text-center">
-            <Users className="w-8 h-8 text-green-500 mx-auto mb-2" />
-            <div className="text-2xl font-bold text-[#8B4513]">3</div>
-            <div className="text-[#666]">Squad Battles Won</div>
-          </div>
-          <div className="text-center">
-            <Trophy className="w-8 h-8 text-purple-500 mx-auto mb-2" />
-            <div className="text-2xl font-bold text-[#8B4513]">12</div>
-            <div className="text-[#666]">Streak Days</div>
+              </Card>
+            ))}
           </div>
         </div>
-      </Card>
+      )}
     </div>
   );
 };

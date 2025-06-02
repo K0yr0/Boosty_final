@@ -8,6 +8,7 @@ import { toast } from '@/hooks/use-toast';
 const AINotesPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedWeek, setSelectedWeek] = useState('week5');
+  const [flippedCards, setFlippedCards] = useState<number[]>([]);
 
   const notesData = {
     week5: {
@@ -168,6 +169,12 @@ const AINotesPage: React.FC = () => {
   }
 
   const handleDownload = () => {
+    // Simulate download functionality
+    const link = document.createElement('a');
+    link.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent('Notes for ' + currentNotes.title);
+    link.download = `${currentNotes.title.replace(/\s+/g, '_')}_notes.txt`;
+    link.click();
+    
     toast({
       title: 'Notes Downloaded',
       description: 'PDF saved to your downloads folder',
@@ -175,10 +182,20 @@ const AINotesPage: React.FC = () => {
   };
 
   const handleGenerateFlashcards = () => {
+    // Generate new flashcards based on confusion data
+    const newFlashcardsGenerated = currentNotes.confusionPeaks.length;
     toast({
       title: 'Flashcards Generated',
-      description: 'New flashcards created based on confusion data',
+      description: `${newFlashcardsGenerated} new flashcards created based on confusion data`,
     });
+  };
+
+  const handleFlipCard = (index: number) => {
+    setFlippedCards(prev => 
+      prev.includes(index) 
+        ? prev.filter(i => i !== index)
+        : [...prev, index]
+    );
   };
 
   return (
@@ -304,14 +321,27 @@ const AINotesPage: React.FC = () => {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {currentNotes.flashcards.map((card, index) => (
-            <div key={index} className="border border-[#e0e0e0] rounded-lg overflow-hidden">
-              <div className="bg-[#fff3e6] p-4">
-                <h4 className="font-medium text-[#2c2c2c] mb-2">Question:</h4>
-                <p className="text-[#666]">{card.question}</p>
-              </div>
-              <div className="p-4 bg-white">
-                <h4 className="font-medium text-[#2c2c2c] mb-2">Answer:</h4>
-                <p className="text-[#666]">{card.answer}</p>
+            <div 
+              key={index} 
+              className="border border-[#e0e0e0] rounded-lg overflow-hidden cursor-pointer transform transition-transform hover:scale-105"
+              onClick={() => handleFlipCard(index)}
+            >
+              <div className="relative h-40 bg-gradient-to-br from-[#fff3e6] to-[#f0e6d2] p-4 flex items-center justify-center">
+                <div className="text-center">
+                  {!flippedCards.includes(index) ? (
+                    <>
+                      <h4 className="font-medium text-[#2c2c2c] mb-2">Question:</h4>
+                      <p className="text-[#666] text-sm">{card.question}</p>
+                      <p className="text-xs text-[#8B4513] mt-2">Click to reveal answer</p>
+                    </>
+                  ) : (
+                    <>
+                      <h4 className="font-medium text-[#2c2c2c] mb-2">Answer:</h4>
+                      <p className="text-[#666] text-sm">{card.answer}</p>
+                      <p className="text-xs text-[#8B4513] mt-2">Click to see question</p>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
           ))}

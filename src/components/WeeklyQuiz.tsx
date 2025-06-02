@@ -1,10 +1,9 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { Award, Clock, CheckCircle, XCircle, TrendingUp } from 'lucide-react';
+import { Award, Clock, CheckCircle, XCircle, TrendingUp, Shield } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 const WeeklyQuiz: React.FC = () => {
@@ -12,6 +11,69 @@ const WeeklyQuiz: React.FC = () => {
   const [selectedAnswers, setSelectedAnswers] = useState<string[]>([]);
   const [showResults, setShowResults] = useState(false);
   const [quizStarted, setQuizStarted] = useState(false);
+  const [showWarning, setShowWarning] = useState(false);
+
+  // Screenshot prevention
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Prevent common screenshot shortcuts
+      if (
+        (e.ctrlKey && e.shiftKey && e.key === 'S') || // Ctrl+Shift+S
+        (e.metaKey && e.shiftKey && e.key === '3') || // Cmd+Shift+3 (Mac)
+        (e.metaKey && e.shiftKey && e.key === '4') || // Cmd+Shift+4 (Mac)
+        e.key === 'PrintScreen' // Print Screen
+      ) {
+        e.preventDefault();
+        setShowWarning(true);
+        toast({
+          title: 'Screenshot Blocked',
+          description: 'Screenshots are not allowed during quizzes',
+          variant: "destructive",
+        });
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden && quizStarted && !showResults) {
+        toast({
+          title: 'Tab Switch Detected',
+          description: 'Please stay on the quiz tab',
+          variant: "destructive",
+        });
+      }
+    };
+
+    if (quizStarted) {
+      document.addEventListener('keydown', handleKeyDown);
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+      
+      // Disable right-click context menu
+      const handleContextMenu = (e: MouseEvent) => {
+        e.preventDefault();
+        setShowWarning(true);
+        toast({
+          title: 'Right-click Disabled',
+          description: 'Context menu is disabled during quizzes',
+          variant: "destructive",
+        });
+      };
+      document.addEventListener('contextmenu', handleContextMenu);
+
+      return () => {
+        document.removeEventListener('keydown', handleKeyDown);
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+        document.removeEventListener('contextmenu', handleContextMenu);
+      };
+    }
+  }, [quizStarted, showResults]);
+
+  // Hide warning after 3 seconds
+  useEffect(() => {
+    if (showWarning) {
+      const timer = setTimeout(() => setShowWarning(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [showWarning]);
 
   const quiz = {
     title: 'Week 5: Recursion Quiz',
@@ -72,7 +134,7 @@ const WeeklyQuiz: React.FC = () => {
     setShowResults(false);
     toast({
       title: 'Quiz Started!',
-      description: 'You have 15 minutes to complete 10 questions',
+      description: 'You have 15 minutes to complete the questions. Screenshots are disabled.',
     });
   };
 
@@ -112,6 +174,17 @@ const WeeklyQuiz: React.FC = () => {
     return (
       <div className="space-y-6">
         <h2 className="text-2xl font-bold text-[#2c2c2c]">Weekly Pop-Up Quiz</h2>
+
+        {/* Security Notice */}
+        <Card className="p-4 bg-yellow-50 border border-yellow-200">
+          <div className="flex items-center">
+            <Shield className="w-5 h-5 text-yellow-600 mr-2" />
+            <div>
+              <h4 className="font-semibold text-yellow-800">Security Notice</h4>
+              <p className="text-yellow-700 text-sm">Screenshots and tab switching are monitored during quizzes</p>
+            </div>
+          </div>
+        </Card>
 
         {/* Quiz Overview */}
         <Card className="p-6 bg-white">
@@ -259,6 +332,19 @@ const WeeklyQuiz: React.FC = () => {
   
   return (
     <div className="space-y-6">
+      {/* Security Warning Overlay */}
+      {showWarning && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <Card className="p-6 bg-red-50 border-2 border-red-300 max-w-md mx-4">
+            <div className="text-center">
+              <Shield className="w-12 h-12 text-red-600 mx-auto mb-4" />
+              <h3 className="text-xl font-bold text-red-800 mb-2">Security Alert</h3>
+              <p className="text-red-700">Screenshots and unauthorized actions are not allowed during quizzes!</p>
+            </div>
+          </Card>
+        </div>
+      )}
+
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-[#2c2c2c]">Weekly Quiz</h2>
         <div className="text-[#666]">

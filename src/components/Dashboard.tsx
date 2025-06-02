@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -10,7 +9,7 @@ import WeeklyQuiz from './WeeklyQuiz';
 import ProjectMatching from './ProjectMatching';
 
 interface DashboardProps {
-  user: { name: string } | null;
+  user: { name: string; role: string } | null;
   onLogout: () => void;
 }
 
@@ -31,7 +30,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onLogout }) => {
   const renderContent = () => {
     switch (activePage) {
       case 'pulse':
-        return <LecturePulse />;
+        return <LecturePulse userRole="student" />;
       case 'notes':
         return <AINotesPage />;
       case 'squads':

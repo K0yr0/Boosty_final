@@ -5,7 +5,11 @@ import { Card } from '@/components/ui/card';
 import { Frown, Meh, Smile, TrendingUp, Users, Clock } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
-const LecturePulse: React.FC = () => {
+interface LecturePulseProps {
+  userRole: 'student' | 'professor';
+}
+
+const LecturePulse: React.FC<LecturePulseProps> = ({ userRole }) => {
   const [currentSlide, setCurrentSlide] = useState(12);
   const [isLiveSession, setIsLiveSession] = useState(false);
   const [feedbackCounts, setFeedbackCounts] = useState({
@@ -13,14 +17,26 @@ const LecturePulse: React.FC = () => {
     unsure: 0,
     gotIt: 0,
   });
+  const [hasVotedThisSlide, setHasVotedThisSlide] = useState(false);
 
   const totalStudents = 45;
 
   const handleFeedback = (type: 'confused' | 'unsure' | 'gotIt') => {
+    if (hasVotedThisSlide) {
+      toast({
+        title: 'Already Voted',
+        description: 'You can only vote once per slide',
+        variant: "destructive",
+      });
+      return;
+    }
+
     setFeedbackCounts(prev => ({
       ...prev,
       [type]: prev[type] + 1,
     }));
+    
+    setHasVotedThisSlide(true);
     
     const messages = {
       confused: 'Feedback sent: Confused 😕',
@@ -35,9 +51,19 @@ const LecturePulse: React.FC = () => {
   };
 
   const toggleSession = () => {
+    if (userRole !== 'professor') {
+      toast({
+        title: 'Access Denied',
+        description: 'Only professors can start live sessions',
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLiveSession(!isLiveSession);
     if (!isLiveSession) {
       setFeedbackCounts({ confused: 0, unsure: 0, gotIt: 0 });
+      setHasVotedThisSlide(false);
       toast({
         title: 'Live Session Started',
         description: 'Students can now provide real-time feedback',
@@ -50,6 +76,13 @@ const LecturePulse: React.FC = () => {
     }
   };
 
+  const nextSlide = () => {
+    if (userRole !== 'professor') return;
+    setCurrentSlide(prev => prev + 1);
+    setHasVotedThisSlide(false);
+    setFeedbackCounts({ confused: 0, unsure: 0, gotIt: 0 });
+  };
+
   const confusionPercentage = Math.round((feedbackCounts.confused / totalStudents) * 100);
   const understandingPercentage = Math.round((feedbackCounts.gotIt / totalStudents) * 100);
 
@@ -57,16 +90,29 @@ const LecturePulse: React.FC = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-[#2c2c2c]">Lecture Pulse</h2>
-        <Button
-          onClick={toggleSession}
-          className={`${
-            isLiveSession 
-              ? 'bg-red-500 hover:bg-red-600' 
-              : 'bg-[#8B4513] hover:bg-[#654321]'
-          } text-white`}
-        >
-          {isLiveSession ? 'End Session' : 'Start Live Session'}
-        </Button>
+        <div className="flex space-x-2">
+          {userRole === 'professor' && (
+            <>
+              <Button
+                onClick={nextSlide}
+                disabled={!isLiveSession}
+                className="bg-blue-500 hover:bg-blue-600 text-white"
+              >
+                Next Slide
+              </Button>
+              <Button
+                onClick={toggleSession}
+                className={`${
+                  isLiveSession 
+                    ? 'bg-red-500 hover:bg-red-600' 
+                    : 'bg-[#8B4513] hover:bg-[#654321]'
+                } text-white`}
+              >
+                {isLiveSession ? 'End Session' : 'Start Live Session'}
+              </Button>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Live Session Status */}
@@ -101,41 +147,48 @@ const LecturePulse: React.FC = () => {
       </Card>
 
       {/* Student Feedback Panel */}
-      <Card className="p-6 bg-white">
-        <h3 className="text-lg font-semibold text-[#2c2c2c] mb-4">Quick Feedback</h3>
-        <div className="grid grid-cols-3 gap-4">
-          <Button
-            onClick={() => handleFeedback('confused')}
-            disabled={!isLiveSession}
-            className="h-20 bg-red-100 hover:bg-red-200 text-red-600 border border-red-300 flex flex-col items-center justify-center"
-            variant="outline"
-          >
-            <Frown className="w-8 h-8 mb-2" />
-            <span>Confused</span>
-            <span className="text-sm">({feedbackCounts.confused})</span>
-          </Button>
-          <Button
-            onClick={() => handleFeedback('unsure')}
-            disabled={!isLiveSession}
-            className="h-20 bg-yellow-100 hover:bg-yellow-200 text-yellow-600 border border-yellow-300 flex flex-col items-center justify-center"
-            variant="outline"
-          >
-            <Meh className="w-8 h-8 mb-2" />
-            <span>Unsure</span>
-            <span className="text-sm">({feedbackCounts.unsure})</span>
-          </Button>
-          <Button
-            onClick={() => handleFeedback('gotIt')}
-            disabled={!isLiveSession}
-            className="h-20 bg-green-100 hover:bg-green-200 text-green-600 border border-green-300 flex flex-col items-center justify-center"
-            variant="outline"
-          >
-            <Smile className="w-8 h-8 mb-2" />
-            <span>Got It!</span>
-            <span className="text-sm">({feedbackCounts.gotIt})</span>
-          </Button>
-        </div>
-      </Card>
+      {userRole === 'student' && (
+        <Card className="p-6 bg-white">
+          <h3 className="text-lg font-semibold text-[#2c2c2c] mb-4">Quick Feedback</h3>
+          {hasVotedThisSlide && (
+            <div className="mb-4 p-3 bg-green-100 border border-green-300 rounded-lg">
+              <span className="text-green-600">✅ Vote submitted for Slide {currentSlide}</span>
+            </div>
+          )}
+          <div className="grid grid-cols-3 gap-4">
+            <Button
+              onClick={() => handleFeedback('confused')}
+              disabled={!isLiveSession || hasVotedThisSlide}
+              className="h-20 bg-red-100 hover:bg-red-200 text-red-600 border border-red-300 flex flex-col items-center justify-center"
+              variant="outline"
+            >
+              <Frown className="w-8 h-8 mb-2" />
+              <span>Confused</span>
+              <span className="text-sm">({feedbackCounts.confused})</span>
+            </Button>
+            <Button
+              onClick={() => handleFeedback('unsure')}
+              disabled={!isLiveSession || hasVotedThisSlide}
+              className="h-20 bg-yellow-100 hover:bg-yellow-200 text-yellow-600 border border-yellow-300 flex flex-col items-center justify-center"
+              variant="outline"
+            >
+              <Meh className="w-8 h-8 mb-2" />
+              <span>Unsure</span>
+              <span className="text-sm">({feedbackCounts.unsure})</span>
+            </Button>
+            <Button
+              onClick={() => handleFeedback('gotIt')}
+              disabled={!isLiveSession || hasVotedThisSlide}
+              className="h-20 bg-green-100 hover:bg-green-200 text-green-600 border border-green-300 flex flex-col items-center justify-center"
+              variant="outline"
+            >
+              <Smile className="w-8 h-8 mb-2" />
+              <span>Got It!</span>
+              <span className="text-sm">({feedbackCounts.gotIt})</span>
+            </Button>
+          </div>
+        </Card>
+      )}
 
       {/* Real-time Analytics */}
       <Card className="p-6 bg-white">
@@ -181,18 +234,21 @@ const LecturePulse: React.FC = () => {
         </div>
       </Card>
 
-      {/* Top Questions */}
+      {/* Top Questions with Answers */}
       <Card className="p-6 bg-white">
         <h3 className="text-lg font-semibold text-[#2c2c2c] mb-4">Top 3 Questions (Post-Lecture)</h3>
-        <div className="space-y-3">
-          <div className="p-3 bg-[#fff3e6] rounded-lg">
-            <span className="text-[#2c2c2c] font-medium">1. What's the difference between recursion and iteration?</span>
+        <div className="space-y-4">
+          <div className="p-4 bg-[#fff3e6] rounded-lg">
+            <div className="font-medium text-[#2c2c2c] mb-2">1. What's the difference between recursion and iteration?</div>
+            <div className="text-[#666] text-sm">Answer: Recursion involves a function calling itself, while iteration uses loops. Recursion can be more elegant for certain problems but may use more memory due to function call stack.</div>
           </div>
-          <div className="p-3 bg-[#fff3e6] rounded-lg">
-            <span className="text-[#2c2c2c] font-medium">2. How do you determine the base case in recursion?</span>
+          <div className="p-4 bg-[#fff3e6] rounded-lg">
+            <div className="font-medium text-[#2c2c2c] mb-2">2. How do you determine the base case in recursion?</div>
+            <div className="text-[#666] text-sm">Answer: The base case is the simplest version of the problem that can be solved directly without further recursion. It prevents infinite loops and provides the stopping condition.</div>
           </div>
-          <div className="p-3 bg-[#fff3e6] rounded-lg">
-            <span className="text-[#2c2c2c] font-medium">3. Can you show more examples of recursive algorithms?</span>
+          <div className="p-4 bg-[#fff3e6] rounded-lg">
+            <div className="font-medium text-[#2c2c2c] mb-2">3. Can you show more examples of recursive algorithms?</div>
+            <div className="text-[#666] text-sm">Answer: Common examples include factorial calculation, Fibonacci sequence, tree traversal, binary search, and tower of Hanoi problem.</div>
           </div>
         </div>
       </Card>
