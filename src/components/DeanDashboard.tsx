@@ -283,7 +283,7 @@ const AcademicReports: React.FC = () => {
             </div>
             <div className="space-y-2">
               <div className="flex justify-between">
-                <span>Excellent (>95%)</span>
+                <span>Excellent (&gt;95%)</span>
                 <span className="font-bold">42%</span>
               </div>
               <div className="flex justify-between">
@@ -295,7 +295,7 @@ const AcademicReports: React.FC = () => {
                 <span className="font-bold">18%</span>
               </div>
               <div className="flex justify-between">
-                <span>Poor (<75%)</span>
+                <span>Poor (&lt;75%)</span>
                 <span className="font-bold">5%</span>
               </div>
             </div>
