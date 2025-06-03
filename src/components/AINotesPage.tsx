@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Brain, Search, Tag, AlertTriangle, CheckCircle, Download } from 'lucide-react';
+import { Brain, Search, Tag, AlertTriangle, CheckCircle, Download, Lightbulb } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 const AINotesPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedWeek, setSelectedWeek] = useState('week5');
   const [flippedCards, setFlippedCards] = useState<number[]>([]);
+  const [generatedNotes, setGeneratedNotes] = useState<string[]>([]);
 
   const notesData = {
     week5: {
@@ -41,6 +42,11 @@ const AINotesPage: React.FC = () => {
           answer: 'Factorial calculation, Fibonacci sequence, and binary tree traversal.',
         },
       ],
+      aiNotes: [
+        'Base cases are the most critical part of recursion - they determine when to stop calling the function recursively. Without proper base cases, your program will crash with a stack overflow.',
+        'Stack overflow occurs when too many function calls are stacked on top of each other. This happens when recursion goes too deep or lacks proper termination conditions.',
+        'Think of recursion like a mirror facing another mirror - it creates infinite reflections unless you put something in between to stop it. That "something" is your base case.',
+      ]
     },
     week4: {
       title: 'Week 4: Arrays & Loops',
@@ -68,6 +74,10 @@ const AINotesPage: React.FC = () => {
           answer: 'A loop inside another loop, often used for processing 2D arrays.',
         },
       ],
+      aiNotes: [
+        'Nested loops can be tricky - the inner loop runs completely for each iteration of the outer loop. If outer loop runs 3 times and inner loop runs 4 times, total iterations = 3 × 4 = 12.',
+        'Array indexing confusion often comes from thinking arrays start at 1. Remember: first element is at index 0, last element is at index (length - 1).',
+      ]
     },
     week3: {
       title: 'Week 3: Functions',
@@ -95,6 +105,10 @@ const AINotesPage: React.FC = () => {
           answer: 'It sends a value back to the code that called the function.',
         },
       ],
+      aiNotes: [
+        'Return statements immediately exit the function and send a value back. Code after a return statement in the same block will never execute.',
+        'Function parameters are like placeholders - they receive actual values (arguments) when the function is called.',
+      ]
     },
     week2: {
       title: 'Week 2: Variables',
@@ -122,6 +136,10 @@ const AINotesPage: React.FC = () => {
           answer: 'Integer, string, and boolean.',
         },
       ],
+      aiNotes: [
+        'Variable scope determines visibility - global variables can be accessed anywhere, local variables only within their function or block.',
+        'Data type confusion often happens when mixing numbers and strings. "5" + 3 might give "53" instead of 8 in some languages.',
+      ]
     },
     week1: {
       title: 'Week 1: Introduction',
@@ -149,12 +167,15 @@ const AINotesPage: React.FC = () => {
           answer: 'The set of rules that define valid code structure in a programming language.',
         },
       ],
+      aiNotes: [
+        'Programming concepts can seem abstract at first, but think of it like giving directions to someone who follows instructions very literally.',
+        'IDE setup issues are common for beginners - most problems come from incorrect installation or missing dependencies.',
+      ]
     },
   };
 
   const currentNotes = notesData[selectedWeek as keyof typeof notesData];
 
-  // Add fallback for when data doesn't exist
   if (!currentNotes) {
     return (
       <div className="space-y-6">
@@ -169,7 +190,6 @@ const AINotesPage: React.FC = () => {
   }
 
   const handleDownload = () => {
-    // Simulate download functionality
     const link = document.createElement('a');
     link.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent('Notes for ' + currentNotes.title);
     link.download = `${currentNotes.title.replace(/\s+/g, '_')}_notes.txt`;
@@ -182,11 +202,24 @@ const AINotesPage: React.FC = () => {
   };
 
   const handleGenerateFlashcards = () => {
-    // Generate new flashcards based on confusion data
-    const newFlashcardsGenerated = currentNotes.confusionPeaks.length;
+    const newFlashcard = {
+      question: `What strategies help with ${currentNotes.confusionPeaks[0]?.topic}?`,
+      answer: `Focus on understanding the fundamental concept step by step. Practice with simple examples before moving to complex scenarios.`
+    };
+    
+    currentNotes.flashcards.push(newFlashcard);
+    
     toast({
-      title: 'Flashcards Generated',
-      description: `${newFlashcardsGenerated} new flashcards created based on confusion data`,
+      title: 'Flashcard Generated!',
+      description: `New flashcard created for ${currentNotes.confusionPeaks[0]?.topic}`,
+    });
+  };
+
+  const handleGenerateAINotes = () => {
+    setGeneratedNotes(currentNotes.aiNotes || []);
+    toast({
+      title: 'AI Notes Generated!',
+      description: 'Smart notes created based on confusion areas',
     });
   };
 
@@ -203,6 +236,13 @@ const AINotesPage: React.FC = () => {
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-[#2c2c2c]">AI Notes & Highlights</h2>
         <div className="flex space-x-2">
+          <Button
+            onClick={handleGenerateAINotes}
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+          >
+            <Lightbulb className="w-4 h-4 mr-2" />
+            Generate AI Notes
+          </Button>
           <Button
             onClick={handleGenerateFlashcards}
             className="bg-[#8B4513] hover:bg-[#654321] text-white"
@@ -247,6 +287,23 @@ const AINotesPage: React.FC = () => {
           </select>
         </div>
       </Card>
+
+      {/* AI Generated Notes */}
+      {generatedNotes.length > 0 && (
+        <Card className="p-6 bg-white">
+          <div className="flex items-center mb-4">
+            <Lightbulb className="w-6 h-6 text-blue-600 mr-2" />
+            <h3 className="text-lg font-semibold text-[#2c2c2c]">AI-Generated Study Notes</h3>
+          </div>
+          <div className="space-y-3">
+            {generatedNotes.map((note, index) => (
+              <div key={index} className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-[#2c2c2c]">{note}</p>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
 
       {/* Confusion Analysis */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -323,22 +380,22 @@ const AINotesPage: React.FC = () => {
           {currentNotes.flashcards.map((card, index) => (
             <div 
               key={index} 
-              className="border border-[#e0e0e0] rounded-lg overflow-hidden cursor-pointer transform transition-transform hover:scale-105"
+              className="border border-[#e0e0e0] rounded-lg overflow-hidden cursor-pointer transform transition-all duration-300 hover:scale-105 h-40"
               onClick={() => handleFlipCard(index)}
             >
-              <div className="relative h-40 bg-gradient-to-br from-[#fff3e6] to-[#f0e6d2] p-4 flex items-center justify-center">
+              <div className="relative h-full bg-gradient-to-br from-[#fff3e6] to-[#f0e6d2] p-4 flex items-center justify-center">
                 <div className="text-center">
                   {!flippedCards.includes(index) ? (
                     <>
-                      <h4 className="font-medium text-[#2c2c2c] mb-2">Question:</h4>
-                      <p className="text-[#666] text-sm">{card.question}</p>
-                      <p className="text-xs text-[#8B4513] mt-2">Click to reveal answer</p>
+                      <div className="text-xs text-[#8B4513] mb-2 font-semibold">QUESTION</div>
+                      <p className="text-[#2c2c2c] text-sm font-medium">{card.question}</p>
+                      <p className="text-xs text-[#8B4513] mt-3 opacity-75">Click to reveal answer</p>
                     </>
                   ) : (
                     <>
-                      <h4 className="font-medium text-[#2c2c2c] mb-2">Answer:</h4>
-                      <p className="text-[#666] text-sm">{card.answer}</p>
-                      <p className="text-xs text-[#8B4513] mt-2">Click to see question</p>
+                      <div className="text-xs text-[#8B4513] mb-2 font-semibold">ANSWER</div>
+                      <p className="text-[#2c2c2c] text-sm">{card.answer}</p>
+                      <p className="text-xs text-[#8B4513] mt-3 opacity-75">Click to see question</p>
                     </>
                   )}
                 </div>

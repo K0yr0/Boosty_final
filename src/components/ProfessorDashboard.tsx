@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { LogOut, Home, Users, BookOpen, Brain, Target, FileText } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
 import LecturePulse from './LecturePulse';
 import StudentProfiles from './StudentProfiles';
 import NotesAndMaterials from './NotesAndMaterials';
@@ -99,6 +100,28 @@ const ProfessorDashboard: React.FC<ProfessorDashboardProps> = ({ user, onLogout 
 };
 
 const ProfessorHomePage: React.FC<{ userName: string }> = ({ userName }) => {
+  const handleViewReports = () => {
+    toast({
+      title: 'Generating Reports',
+      description: 'Comprehensive class performance report is being generated...',
+    });
+    
+    // Simulate report generation
+    setTimeout(() => {
+      toast({
+        title: 'Reports Ready!',
+        description: 'Class performance reports have been downloaded to your computer.',
+      });
+    }, 2000);
+  };
+
+  const handleStartLiveSession = () => {
+    toast({
+      title: 'Live Session Started',
+      description: 'Students can now join your live feedback session.',
+    });
+  };
+
   return (
     <div className="space-y-6">
       <div className="text-center mb-8">
@@ -141,10 +164,17 @@ const ProfessorHomePage: React.FC<{ userName: string }> = ({ userName }) => {
         <Card className="p-6 bg-white">
           <h3 className="text-xl font-semibold text-[#2c2c2c] mb-4">Quick Actions</h3>
           <div className="space-y-2">
-            <Button className="w-full bg-[#8B4513] hover:bg-[#654321] text-white">
+            <Button 
+              onClick={handleStartLiveSession}
+              className="w-full bg-[#8B4513] hover:bg-[#654321] text-white"
+            >
               Start Live Session
             </Button>
-            <Button variant="outline" className="w-full border-[#8B4513] text-[#8B4513]">
+            <Button 
+              onClick={handleViewReports}
+              variant="outline" 
+              className="w-full border-[#8B4513] text-[#8B4513] hover:bg-[#8B4513] hover:text-white"
+            >
               View Reports
             </Button>
           </div>

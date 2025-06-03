@@ -3,11 +3,11 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Users, Star, MessageCircle, CheckCircle, TrendingUp } from 'lucide-react';
+import { Users, Star, MessageCircle, CheckCircle, TrendingUp, Clock, UserPlus } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 const ProjectMatching: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'matches' | 'requests' | 'teams'>('matches');
+  const [activeTab, setActiveTab] = useState<'matches' | 'requests' | 'teams' | 'received'>('matches');
 
   const userProfile = {
     name: 'Kayra',
@@ -32,7 +32,7 @@ const ProjectMatching: React.FC = () => {
     },
     {
       id: 2,
-      name: 'Mehmet',
+      name: 'Michael',
       class: 'AI02',
       score: 88,
       skillBracket: 'A (85-100%)',
@@ -43,7 +43,7 @@ const ProjectMatching: React.FC = () => {
     },
     {
       id: 3,
-      name: 'Zeynep',
+      name: 'Sophia',
       class: 'AI04',
       score: 92,
       skillBracket: 'A (85-100%)',
@@ -77,11 +77,38 @@ const ProjectMatching: React.FC = () => {
     },
   ];
 
+  const receivedRequests = [
+    {
+      id: 1,
+      from: 'Emma Thompson',
+      projectTitle: 'Smart Campus System',
+      message: 'Hi! We need someone with algorithm expertise for our IoT campus project. Would you like to join?',
+      timeAgo: '2 hours ago',
+      status: 'pending',
+    },
+    {
+      id: 2,
+      from: 'David Chen',
+      projectTitle: 'AI Tutor Bot',
+      message: 'Your problem-solving skills would be perfect for our AI project. Interested in collaborating?',
+      timeAgo: '1 day ago',
+      status: 'pending',
+    },
+    {
+      id: 3,
+      from: 'Lisa Rodriguez',
+      projectTitle: 'Blockchain Voting',
+      message: 'Looking for a team leader for our blockchain project. Your leadership experience caught our attention!',
+      timeAgo: '3 days ago',
+      status: 'pending',
+    },
+  ];
+
   const currentTeams = [
     {
       id: 1,
       projectTitle: 'AI Study Assistant',
-      members: ['Kayra (You)', 'Irmak', 'Can'],
+      members: ['Kayra (You)', 'Irmak', 'Oliver'],
       progress: 65,
       nextMeeting: 'Tomorrow 2:00 PM',
       status: 'Active',
@@ -89,7 +116,7 @@ const ProjectMatching: React.FC = () => {
     {
       id: 2,
       projectTitle: 'Campus Navigation System',
-      members: ['Kayra (You)', 'Ayşe', 'Mehmet', 'Zeynep'],
+      members: ['Kayra (You)', 'Ada', 'Michael', 'Sophia'],
       progress: 30,
       nextMeeting: 'Friday 10:00 AM',
       status: 'Planning',
@@ -107,6 +134,38 @@ const ProjectMatching: React.FC = () => {
     toast({
       title: 'Request Sent!',
       description: 'Project owner will review your application',
+    });
+  };
+
+  const handleRequestResponse = (requestId: number, action: 'accept' | 'decline') => {
+    const request = receivedRequests.find(r => r.id === requestId);
+    if (action === 'accept') {
+      toast({
+        title: 'Request Accepted!',
+        description: `You've joined ${request?.projectTitle}. Check your teams tab.`,
+      });
+    } else {
+      toast({
+        title: 'Request Declined',
+        description: 'The request has been declined.',
+      });
+    }
+  };
+
+  const handleViewProgress = (teamId: number) => {
+    const team = currentTeams.find(t => t.id === teamId);
+    toast({
+      title: 'Progress Report',
+      description: `${team?.projectTitle}: ${team?.progress}% complete. On track for deadline.`,
+    });
+  };
+
+  const handleTeamChat = (teamId: number) => {
+    const team = currentTeams.find(t => t.id === teamId);
+    window.open('https://discord.com', '_blank');
+    toast({
+      title: 'Team Chat Opened',
+      description: `Opening chat for ${team?.projectTitle}`,
     });
   };
 
@@ -237,6 +296,46 @@ const ProjectMatching: React.FC = () => {
     </div>
   );
 
+  const renderReceivedRequests = () => (
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold text-[#2c2c2c]">Collaboration Requests</h3>
+      {receivedRequests.map((request) => (
+        <Card key={request.id} className="p-6 bg-white">
+          <div className="flex items-start justify-between mb-4">
+            <div>
+              <h4 className="text-lg font-semibold text-[#2c2c2c]">{request.projectTitle}</h4>
+              <p className="text-[#666]">From: {request.from}</p>
+              <div className="flex items-center mt-1">
+                <Clock className="w-4 h-4 text-[#666] mr-1" />
+                <span className="text-[#666] text-sm">{request.timeAgo}</span>
+              </div>
+            </div>
+            <Badge className="bg-yellow-100 text-yellow-700">{request.status}</Badge>
+          </div>
+
+          <p className="text-[#2c2c2c] mb-4 italic">"{request.message}"</p>
+
+          <div className="flex space-x-2">
+            <Button
+              onClick={() => handleRequestResponse(request.id, 'accept')}
+              className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+            >
+              <CheckCircle className="w-4 h-4 mr-2" />
+              Accept
+            </Button>
+            <Button
+              onClick={() => handleRequestResponse(request.id, 'decline')}
+              variant="outline"
+              className="flex-1 border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+            >
+              Decline
+            </Button>
+          </div>
+        </Card>
+      ))}
+    </div>
+  );
+
   const renderTeams = () => (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold text-[#2c2c2c]">Your Active Teams</h3>
@@ -273,12 +372,14 @@ const ProjectMatching: React.FC = () => {
 
           <div className="flex space-x-2">
             <Button
+              onClick={() => handleViewProgress(team.id)}
               className="flex-1 bg-[#8B4513] hover:bg-[#654321] text-white"
             >
               <TrendingUp className="w-4 h-4 mr-2" />
               View Progress
             </Button>
             <Button
+              onClick={() => handleTeamChat(team.id)}
               variant="outline"
               className="flex-1 border-[#8B4513] text-[#8B4513] hover:bg-[#8B4513] hover:text-white"
             >
@@ -318,6 +419,16 @@ const ProjectMatching: React.FC = () => {
           Project Requests
         </button>
         <button
+          onClick={() => setActiveTab('received')}
+          className={`px-4 py-2 font-medium transition-colors ${
+            activeTab === 'received'
+              ? 'text-[#8B4513] border-b-2 border-[#8B4513]'
+              : 'text-[#666] hover:text-[#2c2c2c]'
+          }`}
+        >
+          Requests Received
+        </button>
+        <button
           onClick={() => setActiveTab('teams')}
           className={`px-4 py-2 font-medium transition-colors ${
             activeTab === 'teams'
@@ -332,6 +443,7 @@ const ProjectMatching: React.FC = () => {
       {/* Tab Content */}
       {activeTab === 'matches' && renderMatches()}
       {activeTab === 'requests' && renderRequests()}
+      {activeTab === 'received' && renderReceivedRequests()}
       {activeTab === 'teams' && renderTeams()}
     </div>
   );

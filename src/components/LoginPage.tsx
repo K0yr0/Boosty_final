@@ -6,7 +6,7 @@ import { toast } from '@/hooks/use-toast';
 import { User, Lock, BookOpen } from 'lucide-react';
 
 interface LoginPageProps {
-  onLogin: (userData: { name: string; role: 'student' | 'professor' }) => void;
+  onLogin: (userData: { name: string; role: 'student' | 'professor' | 'dean' }) => void;
 }
 
 const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
@@ -28,10 +28,16 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
         description: "Successfully logged in as professor",
       });
       onLogin({ name: username, role: 'professor' });
+    } else if (username === 'eylül' && password === '34') {
+      toast({
+        title: "Welcome Dean!",
+        description: "Successfully logged in as dean",
+      });
+      onLogin({ name: username, role: 'dean' });
     } else {
       toast({
         title: "Login Failed",
-        description: "Invalid credentials. Try: kayra/12 (student) or ırmak/23 (professor)",
+        description: "Invalid credentials. Try: kayra/12 (student), ırmak/23 (professor), or eylül/34 (dean)",
         variant: "destructive",
       });
     }
@@ -91,6 +97,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
           <p>Demo credentials:</p>
           <p>Student: <span className="font-mono bg-gray-100 px-2 py-1 rounded">kayra / 12</span></p>
           <p>Professor: <span className="font-mono bg-gray-100 px-2 py-1 rounded">ırmak / 23</span></p>
+          <p>Dean: <span className="font-mono bg-gray-100 px-2 py-1 rounded">eylül / 34</span></p>
         </div>
       </div>
     </div>

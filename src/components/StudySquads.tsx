@@ -1,33 +1,14 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Users, Clock, Play, Pause, BarChart, MessageCircle } from 'lucide-react';
+import { Users, Play, Pause, BarChart, MessageCircle } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { usePersistentTimer } from '@/hooks/usePersistentTimer';
 
 const StudySquads: React.FC = () => {
   const [selectedSquad, setSelectedSquad] = useState<number | null>(null);
-  const [pomodoroTime, setPomodoroTime] = useState(25 * 60); // 25 minutes in seconds
-  const [isRunning, setIsRunning] = useState(false);
-  const [currentCycle, setCurrentCycle] = useState(1);
-
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (isRunning && pomodoroTime > 0) {
-      interval = setInterval(() => {
-        setPomodoroTime(time => time - 1);
-      }, 1000);
-    } else if (pomodoroTime === 0) {
-      toast({
-        title: 'Pomodoro Complete!',
-        description: 'Great job! Take a 5-minute break.',
-      });
-      setIsRunning(false);
-      setPomodoroTime(25 * 60);
-      setCurrentCycle(prev => prev + 1);
-    }
-    return () => clearInterval(interval);
-  }, [isRunning, pomodoroTime]);
+  const { pomodoroTime, isRunning, currentCycle, startTimer, pauseTimer, resetTimer } = usePersistentTimer(selectedSquad);
 
   const squads = [
     {
@@ -43,7 +24,7 @@ const StudySquads: React.FC = () => {
     {
       id: 2,
       name: 'Algorithm Enthusiasts',
-      members: ['Sarah', 'Eylül', 'Mike', 'Lisa'],
+      members: ['Sarah', 'Emma', 'Mike', 'Lisa'],
       activeNow: 3,
       totalSessions: 28,
       avgFocusTime: '52 min',
@@ -78,8 +59,7 @@ const StudySquads: React.FC = () => {
 
   const handleLeaveSquad = () => {
     setSelectedSquad(null);
-    setIsRunning(false);
-    setPomodoroTime(25 * 60);
+    resetTimer();
     toast({
       title: 'Left Squad',
       description: 'You have left the study group.',
@@ -87,7 +67,7 @@ const StudySquads: React.FC = () => {
   };
 
   const handleStartPomodoro = () => {
-    setIsRunning(true);
+    startTimer();
     toast({
       title: 'Focus Session Started',
       description: 'Stay focused for the next 25 minutes!',
@@ -95,7 +75,7 @@ const StudySquads: React.FC = () => {
   };
 
   const handlePausePomodoro = () => {
-    setIsRunning(false);
+    pauseTimer();
     toast({
       title: 'Session Paused',
       description: 'Take a quick break and resume when ready.',
@@ -103,18 +83,29 @@ const StudySquads: React.FC = () => {
   };
 
   const handleTeamChat = () => {
+    window.open('https://discord.com', '_blank');
     toast({
-      title: 'Team Chat',
-      description: 'Opening team chat for quick coordination...',
+      title: 'Team Chat Opened',
+      description: 'Opening Discord for team coordination...',
     });
   };
 
   const handleSeeProgress = () => {
     toast({
       title: 'Progress Report',
-      description: 'Viewing detailed study progress and statistics...',
+      description: 'Total study time: 12 hours this week. Keep it up!',
     });
   };
+
+  // Show timer completion notification
+  React.useEffect(() => {
+    if (pomodoroTime === 0 && selectedSquad) {
+      toast({
+        title: 'Pomodoro Complete!',
+        description: 'Great job! Take a 5-minute break.',
+      });
+    }
+  }, [pomodoroTime, selectedSquad]);
 
   return (
     <div className="space-y-6">
