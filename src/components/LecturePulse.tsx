@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Frown, Meh, Smile, TrendingUp, Users, Clock } from 'lucide-react';
+import { Frown, Meh, Smile, TrendingUp, Users, Clock, Send } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 interface LecturePulseProps {
@@ -18,6 +18,7 @@ const LecturePulse: React.FC<LecturePulseProps> = ({ userRole }) => {
     gotIt: 0,
   });
   const [hasVotedThisSlide, setHasVotedThisSlide] = useState(false);
+  const [newQuestion, setNewQuestion] = useState('');
 
   const totalStudents = 45;
 
@@ -81,6 +82,23 @@ const LecturePulse: React.FC<LecturePulseProps> = ({ userRole }) => {
     setCurrentSlide(prev => prev + 1);
     setHasVotedThisSlide(false);
     setFeedbackCounts({ confused: 0, unsure: 0, gotIt: 0 });
+  };
+
+  const handleQuestionSubmit = () => {
+    if (!newQuestion.trim()) {
+      toast({
+        title: 'Error',
+        description: 'Please enter a question before submitting',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    toast({
+      title: 'Question Submitted',
+      description: 'Your question has been sent to the professor',
+    });
+    setNewQuestion('');
   };
 
   const confusionPercentage = Math.round((feedbackCounts.confused / totalStudents) * 100);
@@ -185,6 +203,29 @@ const LecturePulse: React.FC<LecturePulseProps> = ({ userRole }) => {
               <Smile className="w-8 h-8 mb-2" />
               <span>Got It!</span>
               <span className="text-sm">({feedbackCounts.gotIt})</span>
+            </Button>
+          </div>
+        </Card>
+      )}
+
+      {/* Ask Question Section */}
+      {userRole === 'student' && (
+        <Card className="p-6 bg-white">
+          <h3 className="text-lg font-semibold text-[#2c2c2c] mb-4">Ask a Question</h3>
+          <div className="space-y-3">
+            <textarea
+              value={newQuestion}
+              onChange={(e) => setNewQuestion(e.target.value)}
+              placeholder="Type your question here..."
+              className="w-full p-3 border border-[#e0e0e0] rounded-lg focus:border-[#8B4513] focus:outline-none resize-none"
+              rows={3}
+            />
+            <Button
+              onClick={handleQuestionSubmit}
+              className="bg-[#8B4513] hover:bg-[#654321] text-white"
+            >
+              <Send className="w-4 h-4 mr-2" />
+              Submit Question
             </Button>
           </div>
         </Card>

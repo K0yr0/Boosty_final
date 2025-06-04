@@ -22,13 +22,13 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
         description: "Successfully logged in as student",
       });
       onLogin({ name: username, role: 'student' });
-    } else if (username === 'ırmak' && password === '23') {
+    } else if (username === 'irmak' && password === '23') {
       toast({
         title: "Welcome Professor!",
         description: "Successfully logged in as professor",
       });
       onLogin({ name: username, role: 'professor' });
-    } else if (username === 'eylül' && password === '34') {
+    } else if (username === 'eylul' && password === '34') {
       toast({
         title: "Welcome Dean!",
         description: "Successfully logged in as dean",
@@ -37,7 +37,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
     } else {
       toast({
         title: "Login Failed",
-        description: "Invalid credentials. Try: kayra/12 (student), ırmak/23 (professor), or eylül/34 (dean)",
+        description: "Invalid credentials. Try: kayra/12 (student), irmak/23 (professor), or eylul/34 (dean)",
         variant: "destructive",
       });
     }
@@ -96,8 +96,8 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
         <div className="mt-6 text-center text-sm text-[#666]">
           <p>Demo credentials:</p>
           <p>Student: <span className="font-mono bg-gray-100 px-2 py-1 rounded">kayra / 12</span></p>
-          <p>Professor: <span className="font-mono bg-gray-100 px-2 py-1 rounded">ırmak / 23</span></p>
-          <p>Dean: <span className="font-mono bg-gray-100 px-2 py-1 rounded">eylül / 34</span></p>
+          <p>Professor: <span className="font-mono bg-gray-100 px-2 py-1 rounded">irmak / 23</span></p>
+          <p>Dean: <span className="font-mono bg-gray-100 px-2 py-1 rounded">eylul / 34</span></p>
         </div>
       </div>
     </div>

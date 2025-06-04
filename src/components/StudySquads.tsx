@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -83,10 +82,10 @@ const StudySquads: React.FC = () => {
   };
 
   const handleTeamChat = () => {
-    window.open('https://discord.com', '_blank');
+    window.open('https://zoom.us/join', '_blank');
     toast({
       title: 'Team Chat Opened',
-      description: 'Opening Discord for team coordination...',
+      description: 'Opening Zoom for team coordination...',
     });
   };
 

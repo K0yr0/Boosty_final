@@ -1,450 +1,284 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Users, Star, MessageCircle, CheckCircle, TrendingUp, Clock, UserPlus } from 'lucide-react';
+import { Users, Calendar, Clock, MessageCircle, BarChart, UserPlus, Check, X } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import TeamChat from './TeamChat';
 
 const ProjectMatching: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'matches' | 'requests' | 'teams' | 'received'>('matches');
+  const [activeTab, setActiveTab] = useState<'projects' | 'myTeams' | 'requests'>('projects');
+  const [showChat, setShowChat] = useState(false);
+  const [selectedTeam, setSelectedTeam] = useState<{ name: string; members: string[] } | null>(null);
 
-  const userProfile = {
-    name: 'Kayra',
-    class: 'AI01',
-    averageScore: 85,
-    skillBracket: 'A (85-100%)',
-    strengths: ['Algorithms', 'Problem Solving', 'Team Leadership'],
-    preferences: ['Different class groups', 'Similar skill level', 'Complementary strengths'],
-  };
-
-  const suggestedMatches = [
+  const projects = [
     {
       id: 1,
-      name: 'Irmak',
-      class: 'AI03',
-      score: 90,
-      skillBracket: 'A (85-100%)',
-      strengths: ['Data Structures', 'Algorithm Design', 'Code Optimization'],
-      matchPercentage: 95,
-      projectExperience: 'Led 3 successful projects',
-      commonInterests: ['Machine Learning', 'Web Development'],
+      name: 'AI-Powered Tutoring System',
+      description: 'Develop an intelligent tutoring system that adapts to individual student needs and provides personalized learning experiences.',
+      skills: ['Python', 'Machine Learning', 'NLP', 'React'],
+      teamSize: 4,
+      timeline: '6 months',
+      difficulty: 'Advanced',
     },
     {
       id: 2,
-      name: 'Michael',
-      class: 'AI02',
-      score: 88,
-      skillBracket: 'A (85-100%)',
-      strengths: ['Frontend Development', 'UI/UX Design', 'Testing'],
-      matchPercentage: 87,
-      projectExperience: 'Strong in team collaboration',
-      commonInterests: ['Web Development', 'Mobile Apps'],
+      name: 'Blockchain-Based Voting Platform',
+      description: 'Create a secure and transparent voting platform using blockchain technology to ensure fair and verifiable elections.',
+      skills: ['Blockchain', 'Solidity', 'Cryptography', 'Web3.js'],
+      teamSize: 5,
+      timeline: '8 months',
+      difficulty: 'Expert',
     },
     {
       id: 3,
-      name: 'Sophia',
-      class: 'AI04',
-      score: 92,
-      skillBracket: 'A (85-100%)',
-      strengths: ['Backend Development', 'Database Design', 'API Development'],
-      matchPercentage: 91,
-      projectExperience: '5+ completed projects',
-      commonInterests: ['Backend Systems', 'Database Management'],
+      name: 'Sustainable Energy Management App',
+      description: 'Design a mobile app to help users track and reduce their energy consumption, promoting sustainable living and environmental awareness.',
+      skills: ['React Native', 'UI/UX Design', 'Firebase', 'Data Analysis'],
+      teamSize: 3,
+      timeline: '4 months',
+      difficulty: 'Intermediate',
     },
   ];
 
-  const activeRequests = [
+  const myTeams = [
+    {
+      id: 101,
+      name: 'Eco Warriors',
+      members: ['Kayra', 'Eylül', 'James'],
+      startDate: '2024-02-01',
+      project: 'Sustainable Energy Management App',
+    },
+    {
+      id: 102,
+      name: 'Code Alchemists',
+      members: ['Ada', 'Sarah', 'Mike'],
+      startDate: '2024-01-15',
+      project: 'AI-Powered Tutoring System',
+    },
+  ];
+
+  const requests = [
     {
       id: 1,
-      projectTitle: 'E-Commerce Website',
-      course: 'Web Development',
-      teamSize: '3-4 members',
-      deadline: '2 weeks',
-      requiredSkills: ['React', 'Node.js', 'Database'],
-      description: 'Building a full-stack e-commerce platform with modern technologies',
-      status: 'Looking for Backend Developer',
+      projectName: 'E-Commerce Platform',
+      requesterName: 'Sarah',
+      message: 'Hi! I saw your skills and think you\'d be perfect for our team. We need someone with React experience.',
+      timestamp: '2 hours ago',
+      skills: ['React', 'Node.js', 'MongoDB'],
     },
     {
       id: 2,
-      projectTitle: 'Mobile Learning App',
-      course: 'Mobile Development',
-      teamSize: '4-5 members',
-      deadline: '3 weeks',
-      requiredSkills: ['Flutter', 'Firebase', 'UI/UX'],
-      description: 'Educational app for university students with gamification features',
-      status: 'Looking for UI/UX Designer',
+      projectName: 'Mobile Fitness App',
+      requesterName: 'Mike',
+      message: 'Would you like to join our mobile app development team? We could use your frontend skills.',
+      timestamp: '1 day ago',
+      skills: ['React Native', 'UI/UX', 'Firebase'],
     },
   ];
 
-  const receivedRequests = [
-    {
-      id: 1,
-      from: 'Emma Thompson',
-      projectTitle: 'Smart Campus System',
-      message: 'Hi! We need someone with algorithm expertise for our IoT campus project. Would you like to join?',
-      timeAgo: '2 hours ago',
-      status: 'pending',
-    },
-    {
-      id: 2,
-      from: 'David Chen',
-      projectTitle: 'AI Tutor Bot',
-      message: 'Your problem-solving skills would be perfect for our AI project. Interested in collaborating?',
-      timeAgo: '1 day ago',
-      status: 'pending',
-    },
-    {
-      id: 3,
-      from: 'Lisa Rodriguez',
-      projectTitle: 'Blockchain Voting',
-      message: 'Looking for a team leader for our blockchain project. Your leadership experience caught our attention!',
-      timeAgo: '3 days ago',
-      status: 'pending',
-    },
-  ];
-
-  const currentTeams = [
-    {
-      id: 1,
-      projectTitle: 'AI Study Assistant',
-      members: ['Kayra (You)', 'Irmak', 'Oliver'],
-      progress: 65,
-      nextMeeting: 'Tomorrow 2:00 PM',
-      status: 'Active',
-    },
-    {
-      id: 2,
-      projectTitle: 'Campus Navigation System',
-      members: ['Kayra (You)', 'Ada', 'Michael', 'Sophia'],
-      progress: 30,
-      nextMeeting: 'Friday 10:00 AM',
-      status: 'Planning',
-    },
-  ];
-
-  const handleSendMessage = (matchId: number) => {
+  const handleAcceptRequest = (requestId: number) => {
     toast({
-      title: 'Message Sent!',
-      description: 'Your collaboration request has been sent',
+      title: 'Request Accepted',
+      description: 'You have joined the team! Check your teams tab.',
     });
   };
 
-  const handleJoinProject = (projectId: number) => {
+  const handleDeclineRequest = (requestId: number) => {
     toast({
-      title: 'Request Sent!',
-      description: 'Project owner will review your application',
+      title: 'Request Declined',
+      description: 'The request has been declined.',
     });
   };
 
-  const handleRequestResponse = (requestId: number, action: 'accept' | 'decline') => {
-    const request = receivedRequests.find(r => r.id === requestId);
-    if (action === 'accept') {
-      toast({
-        title: 'Request Accepted!',
-        description: `You've joined ${request?.projectTitle}. Check your teams tab.`,
-      });
-    } else {
-      toast({
-        title: 'Request Declined',
-        description: 'The request has been declined.',
-      });
-    }
+  const handleTeamChat = (teamName: string, members: string[]) => {
+    setSelectedTeam({ name: teamName, members });
+    setShowChat(true);
   };
 
-  const handleViewProgress = (teamId: number) => {
-    const team = currentTeams.find(t => t.id === teamId);
+  const handleViewProgress = () => {
     toast({
-      title: 'Progress Report',
-      description: `${team?.projectTitle}: ${team?.progress}% complete. On track for deadline.`,
+      title: 'Team Progress',
+      description: 'Task completion: 65%, Next deadline: March 15th',
     });
   };
-
-  const handleTeamChat = (teamId: number) => {
-    const team = currentTeams.find(t => t.id === teamId);
-    window.open('https://discord.com', '_blank');
-    toast({
-      title: 'Team Chat Opened',
-      description: `Opening chat for ${team?.projectTitle}`,
-    });
-  };
-
-  const renderMatches = () => (
-    <div className="space-y-6">
-      <Card className="p-6 bg-white">
-        <h3 className="text-lg font-semibold text-[#2c2c2c] mb-4">Your Profile</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <p className="text-[#666] mb-2"><strong>Class:</strong> {userProfile.class}</p>
-            <p className="text-[#666] mb-2"><strong>Average Score:</strong> {userProfile.averageScore}%</p>
-            <p className="text-[#666] mb-2"><strong>Skill Bracket:</strong> {userProfile.skillBracket}</p>
-          </div>
-          <div>
-            <p className="text-[#666] mb-2"><strong>Strengths:</strong></p>
-            <div className="flex flex-wrap gap-2">
-              {userProfile.strengths.map((strength, index) => (
-                <Badge key={index} variant="secondary" className="bg-[#fff3e6] text-[#8B4513]">
-                  {strength}
-                </Badge>
-              ))}
-            </div>
-          </div>
-        </div>
-      </Card>
-
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-[#2c2c2c]">Perfect Matches for You</h3>
-        {suggestedMatches.map((match) => (
-          <Card key={match.id} className="p-6 bg-white">
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <h4 className="text-xl font-semibold text-[#2c2c2c]">{match.name}</h4>
-                <p className="text-[#666]">{match.class} • {match.skillBracket}</p>
-              </div>
-              <div className="text-right">
-                <div className="flex items-center mb-1">
-                  <Star className="w-4 h-4 text-yellow-500 mr-1" />
-                  <span className="text-[#8B4513] font-semibold">{match.matchPercentage}% Match</span>
-                </div>
-                <p className="text-[#666] text-sm">Score: {match.score}%</p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <div>
-                <p className="text-[#666] mb-2"><strong>Strengths:</strong></p>
-                <div className="flex flex-wrap gap-2">
-                  {match.strengths.map((strength, index) => (
-                    <Badge key={index} variant="outline" className="border-[#8B4513] text-[#8B4513]">
-                      {strength}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <p className="text-[#666] mb-2"><strong>Common Interests:</strong></p>
-                <div className="flex flex-wrap gap-2">
-                  {match.commonInterests.map((interest, index) => (
-                    <Badge key={index} variant="secondary" className="bg-green-100 text-green-700">
-                      {interest}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <p className="text-[#666] mb-4">{match.projectExperience}</p>
-
-            <Button
-              onClick={() => handleSendMessage(match.id)}
-              className="w-full bg-[#8B4513] hover:bg-[#654321] text-white"
-            >
-              <MessageCircle className="w-4 h-4 mr-2" />
-              Send Collaboration Request
-            </Button>
-          </Card>
-        ))}
-      </div>
-    </div>
-  );
-
-  const renderRequests = () => (
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-[#2c2c2c]">Available Projects</h3>
-      {activeRequests.map((request) => (
-        <Card key={request.id} className="p-6 bg-white">
-          <div className="flex items-start justify-between mb-4">
-            <div>
-              <h4 className="text-xl font-semibold text-[#2c2c2c]">{request.projectTitle}</h4>
-              <p className="text-[#666]">{request.course}</p>
-            </div>
-            <Badge className="bg-blue-100 text-blue-700">{request.status}</Badge>
-          </div>
-
-          <p className="text-[#666] mb-4">{request.description}</p>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-            <div>
-              <p className="text-[#666] mb-1"><strong>Team Size:</strong></p>
-              <p className="text-[#2c2c2c]">{request.teamSize}</p>
-            </div>
-            <div>
-              <p className="text-[#666] mb-1"><strong>Deadline:</strong></p>
-              <p className="text-[#2c2c2c]">{request.deadline}</p>
-            </div>
-            <div>
-              <p className="text-[#666] mb-1"><strong>Required Skills:</strong></p>
-              <div className="flex flex-wrap gap-1">
-                {request.requiredSkills.map((skill, index) => (
-                  <Badge key={index} variant="outline" className="border-[#8B4513] text-[#8B4513]">
-                    {skill}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <Button
-            onClick={() => handleJoinProject(request.id)}
-            className="w-full bg-[#8B4513] hover:bg-[#654321] text-white"
-          >
-            <Users className="w-4 h-4 mr-2" />
-            Request to Join
-          </Button>
-        </Card>
-      ))}
-    </div>
-  );
-
-  const renderReceivedRequests = () => (
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-[#2c2c2c]">Collaboration Requests</h3>
-      {receivedRequests.map((request) => (
-        <Card key={request.id} className="p-6 bg-white">
-          <div className="flex items-start justify-between mb-4">
-            <div>
-              <h4 className="text-lg font-semibold text-[#2c2c2c]">{request.projectTitle}</h4>
-              <p className="text-[#666]">From: {request.from}</p>
-              <div className="flex items-center mt-1">
-                <Clock className="w-4 h-4 text-[#666] mr-1" />
-                <span className="text-[#666] text-sm">{request.timeAgo}</span>
-              </div>
-            </div>
-            <Badge className="bg-yellow-100 text-yellow-700">{request.status}</Badge>
-          </div>
-
-          <p className="text-[#2c2c2c] mb-4 italic">"{request.message}"</p>
-
-          <div className="flex space-x-2">
-            <Button
-              onClick={() => handleRequestResponse(request.id, 'accept')}
-              className="flex-1 bg-green-600 hover:bg-green-700 text-white"
-            >
-              <CheckCircle className="w-4 h-4 mr-2" />
-              Accept
-            </Button>
-            <Button
-              onClick={() => handleRequestResponse(request.id, 'decline')}
-              variant="outline"
-              className="flex-1 border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
-            >
-              Decline
-            </Button>
-          </div>
-        </Card>
-      ))}
-    </div>
-  );
-
-  const renderTeams = () => (
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-[#2c2c2c]">Your Active Teams</h3>
-      {currentTeams.map((team) => (
-        <Card key={team.id} className="p-6 bg-white">
-          <div className="flex items-start justify-between mb-4">
-            <div>
-              <h4 className="text-xl font-semibold text-[#2c2c2c]">{team.projectTitle}</h4>
-              <p className="text-[#666]">Members: {team.members.join(', ')}</p>
-            </div>
-            <Badge className={`${
-              team.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
-            }`}>
-              {team.status}
-            </Badge>
-          </div>
-
-          <div className="mb-4">
-            <div className="flex justify-between mb-2">
-              <span className="text-[#666]">Progress</span>
-              <span className="text-[#2c2c2c] font-semibold">{team.progress}%</span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-3">
-              <div 
-                className="bg-[#8B4513] h-3 rounded-full transition-all duration-500"
-                style={{ width: `${team.progress}%` }}
-              />
-            </div>
-          </div>
-
-          <p className="text-[#666] mb-4">
-            <strong>Next Meeting:</strong> {team.nextMeeting}
-          </p>
-
-          <div className="flex space-x-2">
-            <Button
-              onClick={() => handleViewProgress(team.id)}
-              className="flex-1 bg-[#8B4513] hover:bg-[#654321] text-white"
-            >
-              <TrendingUp className="w-4 h-4 mr-2" />
-              View Progress
-            </Button>
-            <Button
-              onClick={() => handleTeamChat(team.id)}
-              variant="outline"
-              className="flex-1 border-[#8B4513] text-[#8B4513] hover:bg-[#8B4513] hover:text-white"
-            >
-              <MessageCircle className="w-4 h-4 mr-2" />
-              Team Chat
-            </Button>
-          </div>
-        </Card>
-      ))}
-    </div>
-  );
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-[#2c2c2c]">Smart Project Matching</h2>
+      <h2 className="text-2xl font-bold text-[#2c2c2c]">Project Matching</h2>
 
-      {/* Tab Navigation */}
-      <div className="flex space-x-4 border-b border-[#e0e0e0]">
-        <button
-          onClick={() => setActiveTab('matches')}
-          className={`px-4 py-2 font-medium transition-colors ${
-            activeTab === 'matches'
-              ? 'text-[#8B4513] border-b-2 border-[#8B4513]'
-              : 'text-[#666] hover:text-[#2c2c2c]'
-          }`}
-        >
-          Perfect Matches
-        </button>
-        <button
-          onClick={() => setActiveTab('requests')}
-          className={`px-4 py-2 font-medium transition-colors ${
-            activeTab === 'requests'
-              ? 'text-[#8B4513] border-b-2 border-[#8B4513]'
-              : 'text-[#666] hover:text-[#2c2c2c]'
-          }`}
-        >
-          Project Requests
-        </button>
-        <button
-          onClick={() => setActiveTab('received')}
-          className={`px-4 py-2 font-medium transition-colors ${
-            activeTab === 'received'
-              ? 'text-[#8B4513] border-b-2 border-[#8B4513]'
-              : 'text-[#666] hover:text-[#2c2c2c]'
-          }`}
-        >
-          Requests Received
-        </button>
-        <button
-          onClick={() => setActiveTab('teams')}
-          className={`px-4 py-2 font-medium transition-colors ${
-            activeTab === 'teams'
-              ? 'text-[#8B4513] border-b-2 border-[#8B4513]'
-              : 'text-[#666] hover:text-[#2c2c2c]'
-          }`}
-        >
-          My Teams
-        </button>
-      </div>
+      {/* Tabs */}
+      <Card className="p-4 bg-white">
+        <div className="flex space-x-2">
+          <Button
+            onClick={() => setActiveTab('projects')}
+            variant={activeTab === 'projects' ? 'default' : 'outline'}
+            className={activeTab === 'projects' ? 'bg-[#8B4513] hover:bg-[#654321] text-white' : 'border-[#8B4513] text-[#8B4513]'}
+          >
+            Available Projects
+          </Button>
+          <Button
+            onClick={() => setActiveTab('myTeams')}
+            variant={activeTab === 'myTeams' ? 'default' : 'outline'}
+            className={activeTab === 'myTeams' ? 'bg-[#8B4513] hover:bg-[#654321] text-white' : 'border-[#8B4513] text-[#8B4513]'}
+          >
+            My Teams
+          </Button>
+          <Button
+            onClick={() => setActiveTab('requests')}
+            variant={activeTab === 'requests' ? 'default' : 'outline'}
+            className={activeTab === 'requests' ? 'bg-[#8B4513] hover:bg-[#654321] text-white' : 'border-[#8B4513] text-[#8B4513]'}
+          >
+            Requests Received
+          </Button>
+        </div>
+      </Card>
 
-      {/* Tab Content */}
-      {activeTab === 'matches' && renderMatches()}
-      {activeTab === 'requests' && renderRequests()}
-      {activeTab === 'received' && renderReceivedRequests()}
-      {activeTab === 'teams' && renderTeams()}
+      {/* Content based on active tab */}
+      {activeTab === 'projects' && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {projects.map((project) => (
+            <Card key={project.id} className="p-6 bg-white">
+              <h3 className="text-lg font-semibold text-[#2c2c2c] mb-2">{project.name}</h3>
+              <p className="text-[#666] mb-4">{project.description}</p>
+
+              <div className="mb-4">
+                <h4 className="text-sm font-medium text-[#2c2c2c] mb-2">Skills Required:</h4>
+                <div className="flex flex-wrap gap-2">
+                  {project.skills.map((skill, index) => (
+                    <span key={index} className="px-2 py-1 bg-[#fff3e6] text-[#8B4513] text-sm rounded">
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-[#666]">Team Size:</span>
+                  <span className="text-[#2c2c2c]">{project.teamSize}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[#666]">Timeline:</span>
+                  <span className="text-[#2c2c2c]">{project.timeline}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[#666]">Difficulty:</span>
+                  <span className="text-[#2c2c2c]">{project.difficulty}</span>
+                </div>
+              </div>
+
+              <Button className="w-full mt-4 bg-[#8B4513] hover:bg-[#654321] text-white">
+                <UserPlus className="w-4 h-4 mr-2" />
+                Join Project
+              </Button>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {activeTab === 'myTeams' && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {myTeams.map((team) => (
+            <Card key={team.id} className="p-6 bg-white">
+              <h3 className="text-lg font-semibold text-[#2c2c2c] mb-2">{team.name}</h3>
+              <p className="text-[#666] mb-4">Project: {team.project}</p>
+
+              <div className="mb-4">
+                <h4 className="text-sm font-medium text-[#2c2c2c] mb-2">Members:</h4>
+                <div className="flex flex-wrap gap-2">
+                  {team.members.map((member, index) => (
+                    <span key={index} className="px-2 py-1 bg-[#fff3e6] text-[#8B4513] text-sm rounded">
+                      {member}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-[#666]">Start Date:</span>
+                  <span className="text-[#2c2c2c]">{team.startDate}</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <Button
+                  onClick={() => handleTeamChat(team.name, team.members)}
+                  variant="outline"
+                  className="border-[#8B4513] text-[#8B4513] hover:bg-[#8B4513] hover:text-white"
+                >
+                  <MessageCircle className="w-4 h-4 mr-1" />
+                  Team Chat
+                </Button>
+                <Button
+                  onClick={handleViewProgress}
+                  variant="outline"
+                  className="border-[#8B4513] text-[#8B4513] hover:bg-[#8B4513] hover:text-white"
+                >
+                  <BarChart className="w-4 h-4 mr-1" />
+                  View Progress
+                </Button>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {activeTab === 'requests' && (
+        <div className="space-y-4">
+          {requests.map((request) => (
+            <Card key={request.id} className="p-6 bg-white">
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-[#2c2c2c] mb-1">{request.projectName}</h3>
+                  <p className="text-[#666] text-sm">Request from: {request.requesterName}</p>
+                  <p className="text-[#666] text-xs">{request.timestamp}</p>
+                </div>
+              </div>
+
+              <p className="text-[#666] mb-4">{request.message}</p>
+
+              <div className="mb-4">
+                <h4 className="text-sm font-medium text-[#2c2c2c] mb-2">Required Skills:</h4>
+                <div className="flex flex-wrap gap-2">
+                  {request.skills.map((skill, index) => (
+                    <span key={index} className="px-2 py-1 bg-[#fff3e6] text-[#8B4513] text-sm rounded">
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex space-x-2">
+                <Button
+                  onClick={() => handleAcceptRequest(request.id)}
+                  className="bg-green-500 hover:bg-green-600 text-white"
+                >
+                  <Check className="w-4 h-4 mr-1" />
+                  Accept
+                </Button>
+                <Button
+                  onClick={() => handleDeclineRequest(request.id)}
+                  variant="outline"
+                  className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+                >
+                  <X className="w-4 h-4 mr-1" />
+                  Decline
+                </Button>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {/* Team Chat Modal */}
+      {showChat && selectedTeam && (
+        <TeamChat
+          teamName={selectedTeam.name}
+          members={selectedTeam.members}
+          onClose={() => setShowChat(false)}
+        />
+      )}
     </div>
   );
 };
