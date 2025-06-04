@@ -104,30 +104,30 @@ const ProjectMatching: React.FC = () => {
   };
 
   return (
-    <div className="space-y-4 sm:space-y-6 p-2 sm:p-0">
-      <h2 className="text-xl sm:text-2xl font-bold text-[#2c2c2c] px-2 sm:px-0">Project Matching</h2>
+    <div className="space-y-3 sm:space-y-6">
+      <h2 className="text-lg sm:text-2xl font-bold text-[#2c2c2c] px-1">Project Matching</h2>
 
       {/* Tabs */}
-      <Card className="p-3 sm:p-4 bg-white mx-2 sm:mx-0">
-        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+      <Card className="p-2 sm:p-4 bg-white">
+        <div className="flex flex-col space-y-2 sm:space-y-0 sm:flex-row sm:space-x-2">
           <Button
             onClick={() => setActiveTab('projects')}
             variant={activeTab === 'projects' ? 'default' : 'outline'}
-            className={`w-full sm:w-auto text-sm ${activeTab === 'projects' ? 'bg-[#8B4513] hover:bg-[#654321] text-white' : 'border-[#8B4513] text-[#8B4513]'}`}
+            className={`w-full sm:w-auto text-xs sm:text-sm py-2 px-3 ${activeTab === 'projects' ? 'bg-[#8B4513] hover:bg-[#654321] text-white' : 'border-[#8B4513] text-[#8B4513]'}`}
           >
             Available Projects
           </Button>
           <Button
             onClick={() => setActiveTab('myTeams')}
             variant={activeTab === 'myTeams' ? 'default' : 'outline'}
-            className={`w-full sm:w-auto text-sm ${activeTab === 'myTeams' ? 'bg-[#8B4513] hover:bg-[#654321] text-white' : 'border-[#8B4513] text-[#8B4513]'}`}
+            className={`w-full sm:w-auto text-xs sm:text-sm py-2 px-3 ${activeTab === 'myTeams' ? 'bg-[#8B4513] hover:bg-[#654321] text-white' : 'border-[#8B4513] text-[#8B4513]'}`}
           >
             My Teams
           </Button>
           <Button
             onClick={() => setActiveTab('requests')}
             variant={activeTab === 'requests' ? 'default' : 'outline'}
-            className={`w-full sm:w-auto text-sm ${activeTab === 'requests' ? 'bg-[#8B4513] hover:bg-[#654321] text-white' : 'border-[#8B4513] text-[#8B4513]'}`}
+            className={`w-full sm:w-auto text-xs sm:text-sm py-2 px-3 ${activeTab === 'requests' ? 'bg-[#8B4513] hover:bg-[#654321] text-white' : 'border-[#8B4513] text-[#8B4513]'}`}
           >
             Requests Received
           </Button>
@@ -136,24 +136,24 @@ const ProjectMatching: React.FC = () => {
 
       {/* Content based on active tab */}
       {activeTab === 'projects' && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 px-2 sm:px-0">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-6">
           {projects.map((project) => (
-            <Card key={project.id} className="p-4 sm:p-6 bg-white">
-              <h3 className="text-base sm:text-lg font-semibold text-[#2c2c2c] mb-2">{project.name}</h3>
-              <p className="text-[#666] mb-4 text-sm sm:text-base">{project.description}</p>
+            <Card key={project.id} className="p-3 sm:p-6 bg-white">
+              <h3 className="text-sm sm:text-lg font-semibold text-[#2c2c2c] mb-2">{project.name}</h3>
+              <p className="text-[#666] mb-3 sm:mb-4 text-xs sm:text-base leading-relaxed">{project.description}</p>
 
-              <div className="mb-4">
-                <h4 className="text-sm font-medium text-[#2c2c2c] mb-2">Skills Required:</h4>
-                <div className="flex flex-wrap gap-2">
+              <div className="mb-3 sm:mb-4">
+                <h4 className="text-xs sm:text-sm font-medium text-[#2c2c2c] mb-2">Skills Required:</h4>
+                <div className="flex flex-wrap gap-1 sm:gap-2">
                   {project.skills.map((skill, index) => (
-                    <span key={index} className="px-2 py-1 bg-[#fff3e6] text-[#8B4513] text-xs sm:text-sm rounded">
+                    <span key={index} className="px-2 py-1 bg-[#fff3e6] text-[#8B4513] text-xs rounded">
                       {skill}
                     </span>
                   ))}
                 </div>
               </div>
 
-              <div className="space-y-2 text-sm">
+              <div className="space-y-1 sm:space-y-2 text-xs sm:text-sm mb-3 sm:mb-4">
                 <div className="flex justify-between">
                   <span className="text-[#666]">Team Size:</span>
                   <span className="text-[#2c2c2c]">{project.teamSize}</span>
@@ -168,8 +168,8 @@ const ProjectMatching: React.FC = () => {
                 </div>
               </div>
 
-              <Button className="w-full mt-4 bg-[#8B4513] hover:bg-[#654321] text-white text-sm sm:text-base">
-                <UserPlus className="w-4 h-4 mr-2" />
+              <Button className="w-full bg-[#8B4513] hover:bg-[#654321] text-white text-xs sm:text-sm py-2">
+                <UserPlus className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                 Join Project
               </Button>
             </Card>
@@ -178,45 +178,45 @@ const ProjectMatching: React.FC = () => {
       )}
 
       {activeTab === 'myTeams' && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 px-2 sm:px-0">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-6">
           {myTeams.map((team) => (
-            <Card key={team.id} className="p-4 sm:p-6 bg-white">
-              <h3 className="text-base sm:text-lg font-semibold text-[#2c2c2c] mb-2">{team.name}</h3>
-              <p className="text-[#666] mb-4 text-sm sm:text-base">Project: {team.project}</p>
+            <Card key={team.id} className="p-3 sm:p-6 bg-white">
+              <h3 className="text-sm sm:text-lg font-semibold text-[#2c2c2c] mb-2">{team.name}</h3>
+              <p className="text-[#666] mb-3 sm:mb-4 text-xs sm:text-base">Project: {team.project}</p>
 
-              <div className="mb-4">
-                <h4 className="text-sm font-medium text-[#2c2c2c] mb-2">Members:</h4>
-                <div className="flex flex-wrap gap-2">
+              <div className="mb-3 sm:mb-4">
+                <h4 className="text-xs sm:text-sm font-medium text-[#2c2c2c] mb-2">Members:</h4>
+                <div className="flex flex-wrap gap-1 sm:gap-2">
                   {team.members.map((member, index) => (
-                    <span key={index} className="px-2 py-1 bg-[#fff3e6] text-[#8B4513] text-xs sm:text-sm rounded">
+                    <span key={index} className="px-2 py-1 bg-[#fff3e6] text-[#8B4513] text-xs rounded">
                       {member}
                     </span>
                   ))}
                 </div>
               </div>
 
-              <div className="space-y-2 text-sm mb-4">
+              <div className="space-y-1 sm:space-y-2 text-xs sm:text-sm mb-3 sm:mb-4">
                 <div className="flex justify-between">
                   <span className="text-[#666]">Start Date:</span>
                   <span className="text-[#2c2c2c]">{team.startDate}</span>
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-2">
+              <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
                 <Button
                   onClick={() => handleTeamChat(team.name, team.members)}
                   variant="outline"
-                  className="flex-1 border-[#8B4513] text-[#8B4513] hover:bg-[#8B4513] hover:text-white text-sm"
+                  className="flex-1 border-[#8B4513] text-[#8B4513] hover:bg-[#8B4513] hover:text-white text-xs sm:text-sm py-2"
                 >
-                  <MessageCircle className="w-4 h-4 mr-1" />
+                  <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                   Team Chat
                 </Button>
                 <Button
                   onClick={handleViewProgress}
                   variant="outline"
-                  className="flex-1 border-[#8B4513] text-[#8B4513] hover:bg-[#8B4513] hover:text-white text-sm"
+                  className="flex-1 border-[#8B4513] text-[#8B4513] hover:bg-[#8B4513] hover:text-white text-xs sm:text-sm py-2"
                 >
-                  <BarChart className="w-4 h-4 mr-1" />
+                  <BarChart className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                   View Progress
                 </Button>
               </div>
@@ -226,44 +226,44 @@ const ProjectMatching: React.FC = () => {
       )}
 
       {activeTab === 'requests' && (
-        <div className="space-y-4 px-2 sm:px-0">
+        <div className="space-y-3 sm:space-y-4">
           {requests.map((request) => (
-            <Card key={request.id} className="p-4 sm:p-6 bg-white">
-              <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-4 space-y-2 sm:space-y-0">
+            <Card key={request.id} className="p-3 sm:p-6 bg-white">
+              <div className="flex flex-col space-y-2 sm:flex-row sm:items-start sm:justify-between sm:space-y-0 mb-3 sm:mb-4">
                 <div>
-                  <h3 className="text-base sm:text-lg font-semibold text-[#2c2c2c] mb-1">{request.projectName}</h3>
-                  <p className="text-[#666] text-sm">Request from: {request.requesterName}</p>
+                  <h3 className="text-sm sm:text-lg font-semibold text-[#2c2c2c] mb-1">{request.projectName}</h3>
+                  <p className="text-[#666] text-xs sm:text-sm">Request from: {request.requesterName}</p>
                   <p className="text-[#666] text-xs">{request.timestamp}</p>
                 </div>
               </div>
 
-              <p className="text-[#666] mb-4 text-sm sm:text-base">{request.message}</p>
+              <p className="text-[#666] mb-3 sm:mb-4 text-xs sm:text-base leading-relaxed">{request.message}</p>
 
-              <div className="mb-4">
-                <h4 className="text-sm font-medium text-[#2c2c2c] mb-2">Required Skills:</h4>
-                <div className="flex flex-wrap gap-2">
+              <div className="mb-3 sm:mb-4">
+                <h4 className="text-xs sm:text-sm font-medium text-[#2c2c2c] mb-2">Required Skills:</h4>
+                <div className="flex flex-wrap gap-1 sm:gap-2">
                   {request.skills.map((skill, index) => (
-                    <span key={index} className="px-2 py-1 bg-[#fff3e6] text-[#8B4513] text-xs sm:text-sm rounded">
+                    <span key={index} className="px-2 py-1 bg-[#fff3e6] text-[#8B4513] text-xs rounded">
                       {skill}
                     </span>
                   ))}
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+              <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
                 <Button
                   onClick={() => handleAcceptRequest(request.id)}
-                  className="bg-green-500 hover:bg-green-600 text-white text-sm"
+                  className="bg-green-500 hover:bg-green-600 text-white text-xs sm:text-sm py-2"
                 >
-                  <Check className="w-4 h-4 mr-1" />
+                  <Check className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                   Accept
                 </Button>
                 <Button
                   onClick={() => handleDeclineRequest(request.id)}
                   variant="outline"
-                  className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white text-sm"
+                  className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white text-xs sm:text-sm py-2"
                 >
-                  <X className="w-4 h-4 mr-1" />
+                  <X className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                   Decline
                 </Button>
               </div>

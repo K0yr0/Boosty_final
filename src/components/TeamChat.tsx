@@ -49,18 +49,18 @@ const TeamChat: React.FC<TeamChatProps> = ({ teamName, members, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-md h-[90vh] sm:h-96 bg-white flex flex-col">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
+      <Card className="w-full max-w-md h-[95vh] sm:h-96 bg-white flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-3 sm:p-4 border-b border-[#e0e0e0]">
-          <h3 className="text-base sm:text-lg font-semibold text-[#2c2c2c] truncate">{teamName}</h3>
-          <Button onClick={onClose} variant="ghost" size="sm">
+        <div className="flex items-center justify-between p-3 sm:p-4 border-b border-[#e0e0e0] bg-white rounded-t-lg">
+          <h3 className="text-sm sm:text-lg font-semibold text-[#2c2c2c] truncate">{teamName}</h3>
+          <Button onClick={onClose} variant="ghost" size="sm" className="flex-shrink-0">
             <X className="w-4 h-4" />
           </Button>
         </div>
 
         {/* Members */}
-        <div className="px-3 sm:px-4 py-2 border-b border-[#e0e0e0]">
+        <div className="px-3 sm:px-4 py-2 border-b border-[#e0e0e0] bg-gray-50">
           <div className="flex flex-wrap gap-1">
             {members.map((member, index) => (
               <span key={index} className="px-2 py-1 bg-[#fff3e6] text-[#8B4513] text-xs rounded">
@@ -71,30 +71,30 @@ const TeamChat: React.FC<TeamChatProps> = ({ teamName, members, onClose }) => {
         </div>
 
         {/* Messages */}
-        <div className="flex-1 p-3 sm:p-4 overflow-y-auto space-y-3">
+        <div className="flex-1 p-3 sm:p-4 overflow-y-auto space-y-3 bg-white">
           {messages.map((msg) => (
             <div key={msg.id} className="space-y-1">
               <div className="flex items-center space-x-2">
                 <div className="w-6 h-6 bg-[#8B4513] rounded-full flex items-center justify-center flex-shrink-0">
                   <User className="w-3 h-3 text-white" />
                 </div>
-                <span className="text-sm font-medium text-[#2c2c2c] truncate">{msg.sender}</span>
+                <span className="text-xs sm:text-sm font-medium text-[#2c2c2c] truncate">{msg.sender}</span>
                 <span className="text-xs text-[#666] flex-shrink-0">{msg.timestamp}</span>
               </div>
-              <div className="ml-8 text-sm text-[#666] break-words">{msg.message}</div>
+              <div className="ml-8 text-xs sm:text-sm text-[#666] break-words leading-relaxed">{msg.message}</div>
             </div>
           ))}
         </div>
 
         {/* Input */}
-        <div className="p-3 sm:p-4 border-t border-[#e0e0e0]">
+        <div className="p-3 sm:p-4 border-t border-[#e0e0e0] bg-white rounded-b-lg">
           <div className="flex space-x-2">
             <textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Type a message..."
-              className="flex-1 p-2 border border-[#e0e0e0] rounded-lg focus:border-[#8B4513] focus:outline-none resize-none text-sm"
+              className="flex-1 p-2 border border-[#e0e0e0] rounded-lg focus:border-[#8B4513] focus:outline-none resize-none text-xs sm:text-sm"
               rows={2}
             />
             <Button
@@ -102,7 +102,7 @@ const TeamChat: React.FC<TeamChatProps> = ({ teamName, members, onClose }) => {
               className="bg-[#8B4513] hover:bg-[#654321] text-white flex-shrink-0"
               size="sm"
             >
-              <Send className="w-4 h-4" />
+              <Send className="w-3 h-3 sm:w-4 sm:h-4" />
             </Button>
           </div>
         </div>
