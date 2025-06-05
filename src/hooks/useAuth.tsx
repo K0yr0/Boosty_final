@@ -31,6 +31,35 @@ export const useAuth = () => {
   return context;
 };
 
+// Demo users data
+const DEMO_USERS = {
+  'kayra@demo.com': {
+    id: 'demo-student-id',
+    name: 'Kayra',
+    role: 'student' as const,
+    email: 'kayra@demo.com',
+    department: 'Computer Science',
+    student_year: '3rd Year',
+    password: '12'
+  },
+  'irmak@demo.com': {
+    id: 'demo-professor-id',
+    name: 'Irmak',
+    role: 'professor' as const,
+    email: 'irmak@demo.com',
+    department: 'Computer Science',
+    password: '23'
+  },
+  'eylul@demo.com': {
+    id: 'demo-dean-id',
+    name: 'Eylül',
+    role: 'dean' as const,
+    email: 'eylul@demo.com',
+    department: 'Computer Science',
+    password: '34'
+  }
+};
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -38,6 +67,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     console.log('AuthProvider: Setting up auth listener');
+    
+    // Check for demo user in localStorage first
+    const demoUser = localStorage.getItem('demoUser');
+    if (demoUser) {
+      try {
+        const parsedUser = JSON.parse(demoUser);
+        setUser(parsedUser);
+        setLoading(false);
+        return;
+      } catch (error) {
+        console.error('Error parsing demo user:', error);
+        localStorage.removeItem('demoUser');
+      }
+    }
     
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -121,6 +164,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = async (email: string, password: string) => {
     console.log('Attempting login for:', email);
     
+    // Check if this is a demo login
+    const demoUser = DEMO_USERS[email as keyof typeof DEMO_USERS];
+    if (demoUser && demoUser.password === password) {
+      console.log('Demo login successful');
+      const authUser: AuthUser = {
+        id: demoUser.id,
+        name: demoUser.name,
+        role: demoUser.role,
+        email: demoUser.email,
+        department: demoUser.department,
+        student_year: demoUser.student_year
+      };
+      setUser(authUser);
+      localStorage.setItem('demoUser', JSON.stringify(authUser));
+      return;
+    }
+    
+    // Regular Supabase login
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password
@@ -184,11 +245,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logout = async () => {
     console.log('Attempting logout');
     
+    // Clear demo user if present
+    localStorage.removeItem('demoUser');
+    
     const { error } = await supabase.auth.signOut();
     if (error) {
       console.error('Logout error:', error);
       throw error;
     }
+    
+    setUser(null);
+    setSession(null);
     
     console.log('Logout successful');
   };
