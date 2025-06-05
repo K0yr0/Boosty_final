@@ -24,15 +24,20 @@ const AuthenticatedIndexContent = () => {
     return <AuthenticatedLoginPage />;
   }
 
+  const dashboardProps = {
+    user,
+    onLogout: logout
+  };
+
   if (user.role === 'professor') {
-    return <ProfessorDashboard user={user} onLogout={logout} />;
+    return <ProfessorDashboard {...dashboardProps} />;
   }
 
   if (user.role === 'dean') {
-    return <DeanDashboard user={user} onLogout={logout} />;
+    return <DeanDashboard {...dashboardProps} />;
   }
 
-  return <Dashboard user={user} onLogout={logout} />;
+  return <Dashboard {...dashboardProps} />;
 };
 
 const AuthenticatedIndex = () => {
