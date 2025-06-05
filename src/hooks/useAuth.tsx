@@ -1,4 +1,3 @@
-
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User, Session } from '@supabase/supabase-js';
@@ -174,7 +173,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         role: demoUser.role,
         email: demoUser.email,
         department: demoUser.department,
-        student_year: demoUser.student_year
+        student_year: 'student_year' in demoUser ? demoUser.student_year : undefined
       };
       setUser(authUser);
       localStorage.setItem('demoUser', JSON.stringify(authUser));
