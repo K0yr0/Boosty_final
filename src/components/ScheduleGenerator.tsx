@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -290,14 +289,14 @@ const ScheduleGenerator: React.FC = () => {
       {/* Controls */}
       <Card className="p-6 bg-white">
         <div className="flex flex-col space-y-4">
-          <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
-            <div className="flex items-center space-x-4">
+          <div className="flex flex-col space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="text-[#2c2c2c] font-medium mb-2 block">Semester:</label>
                 <select
                   value={selectedSemester}
                   onChange={(e) => setSelectedSemester(e.target.value)}
-                  className="px-4 py-2 border border-[#e0e0e0] rounded-lg focus:border-[#8B4513] focus:outline-none"
+                  className="w-full px-4 py-2 border border-[#e0e0e0] rounded-lg focus:border-[#8B4513] focus:outline-none text-sm"
                 >
                   <option value="fall2024">Fall 2024</option>
                   <option value="spring2025">Spring 2025</option>
@@ -313,17 +312,17 @@ const ScheduleGenerator: React.FC = () => {
                     value={classNumber}
                     onChange={(e) => setClassNumber(e.target.value)}
                     placeholder="e.g., 01, 02, A, B"
-                    className="pl-10 pr-4 py-2 border border-[#e0e0e0] rounded-lg focus:border-[#8B4513] focus:outline-none"
+                    className="w-full pl-10 pr-4 py-2 border border-[#e0e0e0] rounded-lg focus:border-[#8B4513] focus:outline-none text-sm"
                   />
                 </div>
               </div>
             </div>
             
-            <div className="flex space-x-3">
+            <div className="flex flex-col sm:flex-row gap-3">
               <Button
                 onClick={generateRandomSchedule}
                 disabled={isGenerating}
-                className="bg-[#8B4513] hover:bg-[#654321] text-white"
+                className="bg-[#8B4513] hover:bg-[#654321] text-white flex-1 sm:flex-none"
               >
                 {isGenerating ? (
                   <>
@@ -343,7 +342,7 @@ const ScheduleGenerator: React.FC = () => {
                   <Button
                     onClick={downloadSchedule}
                     variant="outline"
-                    className="border-[#8B4513] text-[#8B4513] hover:bg-[#8B4513] hover:text-white"
+                    className="border-[#8B4513] text-[#8B4513] hover:bg-[#8B4513] hover:text-white flex-1 sm:flex-none"
                   >
                     <Download className="w-4 h-4 mr-2" />
                     Download
@@ -351,7 +350,7 @@ const ScheduleGenerator: React.FC = () => {
                   <Button
                     onClick={clearSchedule}
                     variant="outline"
-                    className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+                    className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white flex-1 sm:flex-none"
                   >
                     Clear Schedule
                   </Button>

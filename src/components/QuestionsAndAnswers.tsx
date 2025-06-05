@@ -98,33 +98,33 @@ const QuestionsAndAnswers: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-[#2c2c2c]">Questions & Answers</h2>
+        <h2 className="text-xl md:text-2xl font-bold text-[#2c2c2c]">Questions & Answers</h2>
         <div className="flex items-center space-x-2">
-          <span className="text-[#666]">{unansweredCount} unanswered questions</span>
+          <span className="text-[#666] text-sm">{unansweredCount} unanswered questions</span>
         </div>
       </div>
 
       {/* Filter Buttons */}
       <Card className="p-4 bg-white">
-        <div className="flex space-x-2">
+        <div className="flex flex-col sm:flex-row gap-2">
           <Button
             onClick={() => setFilter('all')}
             variant={filter === 'all' ? 'default' : 'outline'}
-            className={filter === 'all' ? 'bg-[#8B4513] hover:bg-[#654321] text-white' : 'border-[#8B4513] text-[#8B4513]'}
+            className={`${filter === 'all' ? 'bg-[#8B4513] hover:bg-[#654321] text-white' : 'border-[#8B4513] text-[#8B4513]'} text-xs sm:text-sm flex-1 sm:flex-none`}
           >
-            All Questions ({questions.length})
+            All ({questions.length})
           </Button>
           <Button
             onClick={() => setFilter('unanswered')}
             variant={filter === 'unanswered' ? 'default' : 'outline'}
-            className={filter === 'unanswered' ? 'bg-[#8B4513] hover:bg-[#654321] text-white' : 'border-[#8B4513] text-[#8B4513]'}
+            className={`${filter === 'unanswered' ? 'bg-[#8B4513] hover:bg-[#654321] text-white' : 'border-[#8B4513] text-[#8B4513]'} text-xs sm:text-sm flex-1 sm:flex-none`}
           >
             Unanswered ({unansweredCount})
           </Button>
           <Button
             onClick={() => setFilter('answered')}
             variant={filter === 'answered' ? 'default' : 'outline'}
-            className={filter === 'answered' ? 'bg-[#8B4513] hover:bg-[#654321] text-white' : 'border-[#8B4513] text-[#8B4513]'}
+            className={`${filter === 'answered' ? 'bg-[#8B4513] hover:bg-[#654321] text-white' : 'border-[#8B4513] text-[#8B4513]'} text-xs sm:text-sm flex-1 sm:flex-none`}
           >
             Answered ({questions.length - unansweredCount})
           </Button>
@@ -134,16 +134,16 @@ const QuestionsAndAnswers: React.FC = () => {
       {/* Questions List */}
       <div className="space-y-4">
         {filteredQuestions.map((question) => (
-          <Card key={question.id} className="p-6 bg-white">
+          <Card key={question.id} className="p-4 md:p-6 bg-white">
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center">
-                <div className="w-10 h-10 bg-[#8B4513] rounded-full flex items-center justify-center mr-3">
-                  <User className="w-5 h-5 text-white" />
+                <div className="w-8 h-8 md:w-10 md:h-10 bg-[#8B4513] rounded-full flex items-center justify-center mr-3">
+                  <User className="w-4 h-4 md:w-5 md:h-5 text-white" />
                 </div>
                 <div>
-                  <div className="font-semibold text-[#2c2c2c]">{question.student}</div>
-                  <div className="flex items-center text-[#666] text-sm">
-                    <Clock className="w-4 h-4 mr-1" />
+                  <div className="font-semibold text-[#2c2c2c] text-sm md:text-base">{question.student}</div>
+                  <div className="flex items-center text-[#666] text-xs md:text-sm">
+                    <Clock className="w-3 h-3 md:w-4 md:h-4 mr-1" />
                     {question.timestamp}
                     <span className="mx-2">•</span>
                     <span className="px-2 py-1 bg-[#fff3e6] text-[#8B4513] rounded text-xs">
@@ -155,44 +155,44 @@ const QuestionsAndAnswers: React.FC = () => {
               <div className="flex items-center">
                 {question.answered ? (
                   <div className="flex items-center text-green-600">
-                    <Check className="w-5 h-5 mr-1" />
-                    <span className="text-sm">Answered</span>
+                    <Check className="w-4 h-4 md:w-5 md:h-5 mr-1" />
+                    <span className="text-xs md:text-sm">Answered</span>
                   </div>
                 ) : (
                   <div className="flex items-center text-red-600">
-                    <X className="w-5 h-5 mr-1" />
-                    <span className="text-sm">Pending</span>
+                    <X className="w-4 h-4 md:w-5 md:h-5 mr-1" />
+                    <span className="text-xs md:text-sm">Pending</span>
                   </div>
                 )}
               </div>
             </div>
 
             <div className="mb-4">
-              <h3 className="font-medium text-[#2c2c2c] mb-2">Question:</h3>
-              <p className="text-[#666] bg-[#f9f9f9] p-3 rounded-lg">{question.question}</p>
+              <h3 className="font-medium text-[#2c2c2c] mb-2 text-sm md:text-base">Question:</h3>
+              <p className="text-[#666] bg-[#f9f9f9] p-3 rounded-lg text-sm md:text-base">{question.question}</p>
             </div>
 
             {question.answered ? (
               <div>
-                <h4 className="font-medium text-[#2c2c2c] mb-2">Your Answer:</h4>
-                <p className="text-[#666] bg-green-50 p-3 rounded-lg border border-green-200">
+                <h4 className="font-medium text-[#2c2c2c] mb-2 text-sm md:text-base">Your Answer:</h4>
+                <p className="text-[#666] bg-green-50 p-3 rounded-lg border border-green-200 text-sm md:text-base">
                   {question.answer}
                 </p>
               </div>
             ) : (
               <div>
-                <h4 className="font-medium text-[#2c2c2c] mb-2">Write Answer:</h4>
+                <h4 className="font-medium text-[#2c2c2c] mb-2 text-sm md:text-base">Write Answer:</h4>
                 <div className="space-y-3">
                   <textarea
                     value={answerTexts[question.id] || ''}
                     onChange={(e) => handleAnswerChange(question.id, e.target.value)}
                     placeholder="Type your answer here..."
-                    className="w-full p-3 border border-[#e0e0e0] rounded-lg focus:border-[#8B4513] focus:outline-none resize-none"
+                    className="w-full p-3 border border-[#e0e0e0] rounded-lg focus:border-[#8B4513] focus:outline-none resize-none text-sm md:text-base"
                     rows={4}
                   />
                   <Button
                     onClick={() => handleAnswerSubmit(question.id)}
-                    className="bg-[#8B4513] hover:bg-[#654321] text-white"
+                    className="bg-[#8B4513] hover:bg-[#654321] text-white text-sm md:text-base w-full sm:w-auto"
                   >
                     <MessageCircle className="w-4 h-4 mr-2" />
                     Submit Answer
