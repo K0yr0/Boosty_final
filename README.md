@@ -3,6 +3,17 @@
 
 **URL**: https://lovable.dev/projects/22bd6551-defc-4c2a-a733-47115489e1bf
 
+## What technologies are used for this project?
+
+This project is built with:
+
+- Vite
+- TypeScript
+- React
+- shadcn-ui
+- Tailwind CSS
+
+
 ## 2025 hackathon project
 
 Boosty: The Ultimate University Learning Platform (Now with Weekly Quizzes & Smart Project Matching)
@@ -158,14 +169,3 @@ AR textbook annotations
 Alumni mentorship matching
 
 Final Pitch "EduSync Pro is like if Google Docs, Duolingo, and LinkedIn had a baby—designed purely to help universities teach better and students learn smarter."
-
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
