@@ -14,7 +14,89 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      courses: {
+        Row: {
+          academic_year: string
+          code: string
+          created_at: string
+          credits: number
+          department_id: string | null
+          description: string | null
+          id: string
+          name: string
+          professor_id: string | null
+          semester: string
+          updated_at: string
+        }
+        Insert: {
+          academic_year: string
+          code: string
+          created_at?: string
+          credits?: number
+          department_id?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          professor_id?: string | null
+          semester: string
+          updated_at?: string
+        }
+        Update: {
+          academic_year?: string
+          code?: string
+          created_at?: string
+          credits?: number
+          department_id?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          professor_id?: string | null
+          semester?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "courses_professor_id_fkey"
+            columns: ["professor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          department: string | null
+          email: string
+          full_name: string
+          id: string
+          role: string
+          student_year: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          department?: string | null
+          email: string
+          full_name: string
+          id: string
+          role: string
+          student_year?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          department?: string | null
+          email?: string
+          full_name?: string
+          id?: string
+          role?: string
+          student_year?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
