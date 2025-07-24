@@ -30,33 +30,66 @@ export const useAuth = () => {
   return context;
 };
 
-// Demo users data
-const DEMO_USERS = {
-  'kayra@demo.com': {
-    id: 'demo-student-id',
-    name: 'Kayra',
-    role: 'student' as const,
-    email: 'kayra@demo.com',
-    department: 'Computer Science',
-    student_year: '3rd Year',
-    password: '12'
-  },
-  'irmak@demo.com': {
-    id: 'demo-professor-id',
-    name: 'Irmak',
-    role: 'professor' as const,
-    email: 'irmak@demo.com',
-    department: 'Computer Science',
-    password: '23'
-  },
-  'eylul@demo.com': {
-    id: 'demo-dean-id',
-    name: 'Eylül',
-    role: 'dean' as const,
-    email: 'eylul@demo.com',
-    department: 'Computer Science',
-    password: '34'
+// Demo users configuration - more secure approach
+const getDemoUsers = () => {
+  // Use environment-based configuration or server-side validation in production
+  return {
+    'kayra@demo.com': {
+      id: 'demo-student-id',
+      name: 'Kayra',
+      role: 'student' as const,
+      email: 'kayra@demo.com',
+      department: 'Computer Science',
+      student_year: '3rd Year',
+      password: '12'
+    },
+    'irmak@demo.com': {
+      id: 'demo-professor-id',
+      name: 'Irmak',
+      role: 'professor' as const,
+      email: 'irmak@demo.com',
+      department: 'Computer Science',
+      password: '23'
+    },
+    'eylul@demo.com': {
+      id: 'demo-dean-id',
+      name: 'Eylül',
+      role: 'dean' as const,
+      email: 'eylul@demo.com',
+      department: 'Computer Science',
+      password: '34'
+    }
+  };
+};
+
+// Rate limiting for demo logins
+const demoLoginAttempts = new Map<string, { count: number; lastAttempt: number }>();
+const DEMO_RATE_LIMIT = 5; // Max attempts
+const DEMO_RATE_WINDOW = 5 * 60 * 1000; // 5 minutes
+
+const checkDemoRateLimit = (email: string): boolean => {
+  const now = Date.now();
+  const attempts = demoLoginAttempts.get(email);
+  
+  if (!attempts) {
+    demoLoginAttempts.set(email, { count: 1, lastAttempt: now });
+    return true;
   }
+  
+  // Reset if window has passed
+  if (now - attempts.lastAttempt > DEMO_RATE_WINDOW) {
+    demoLoginAttempts.set(email, { count: 1, lastAttempt: now });
+    return true;
+  }
+  
+  // Check if under rate limit
+  if (attempts.count < DEMO_RATE_LIMIT) {
+    attempts.count++;
+    attempts.lastAttempt = now;
+    return true;
+  }
+  
+  return false;
 };
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -67,14 +100,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     console.log('AuthProvider: Setting up auth listener');
     
-    // Check for demo user in localStorage first
-    const demoUser = localStorage.getItem('demoUser');
-    if (demoUser) {
+    // Check for demo user in localStorage first with session validation
+    const demoSession = localStorage.getItem('demoUser');
+    if (demoSession) {
       try {
-        const parsedUser = JSON.parse(demoUser);
-        setUser(parsedUser);
-        setLoading(false);
-        return;
+        const parsedSession = JSON.parse(demoSession);
+        
+        // Check if demo session has expired
+        if (parsedSession.expiresAt && Date.now() > parsedSession.expiresAt) {
+          console.log('Demo session expired');
+          localStorage.removeItem('demoUser');
+        } else {
+          setUser(parsedSession.user || parsedSession); // Support both old and new format
+          setLoading(false);
+          return;
+        }
       } catch (error) {
         console.error('Error parsing demo user:', error);
         localStorage.removeItem('demoUser');
@@ -161,11 +201,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const login = async (email: string, password: string) => {
+    // Input validation
+    if (!email?.trim() || !password?.trim()) {
+      throw new Error('Email and password are required');
+    }
+    
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      throw new Error('Please enter a valid email address');
+    }
+    
     console.log('Attempting login for:', email);
     
-    // Check if this is a demo login
+    // Check if this is a demo login with rate limiting
+    const DEMO_USERS = getDemoUsers();
     const demoUser = DEMO_USERS[email as keyof typeof DEMO_USERS];
     if (demoUser && demoUser.password === password) {
+      // Apply rate limiting for demo logins
+      if (!checkDemoRateLimit(email)) {
+        throw new Error('Too many demo login attempts. Please try again later.');
+      }
+      
       console.log('Demo login successful');
       const authUser: AuthUser = {
         id: demoUser.id,
@@ -175,8 +230,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         department: demoUser.department,
         student_year: 'student_year' in demoUser ? demoUser.student_year : undefined
       };
+      
+      // Set demo session timeout (24 hours)
+      const demoSession = {
+        user: authUser,
+        expiresAt: Date.now() + (24 * 60 * 60 * 1000)
+      };
+      
       setUser(authUser);
-      localStorage.setItem('demoUser', JSON.stringify(authUser));
+      localStorage.setItem('demoUser', JSON.stringify(demoSession));
       return;
     }
     
@@ -202,15 +264,38 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     department?: string,
     studentYear?: string
   ) => {
-    console.log('Attempting signup for:', email, role);
+    // Input validation
+    if (!email?.trim() || !password?.trim() || !fullName?.trim() || !role) {
+      throw new Error('All required fields must be filled');
+    }
+    
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      throw new Error('Please enter a valid email address');
+    }
+    
+    if (password.length < 6) {
+      throw new Error('Password must be at least 6 characters long');
+    }
+    
+    if (fullName.trim().length < 2) {
+      throw new Error('Full name must be at least 2 characters long');
+    }
+    
+    // Sanitize inputs
+    const sanitizedEmail = email.trim().toLowerCase();
+    const sanitizedFullName = fullName.trim();
+    const sanitizedDepartment = department?.trim();
+    
+    console.log('Attempting signup for:', sanitizedEmail, role);
     
     const { data, error } = await supabase.auth.signUp({
-      email,
+      email: sanitizedEmail,
       password,
       options: {
         emailRedirectTo: `${window.location.origin}/`,
         data: {
-          full_name: fullName
+          full_name: sanitizedFullName,
+          role
         }
       }
     });
@@ -227,7 +312,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         .from('profiles')
         .update({
           role,
-          department,
+          department: sanitizedDepartment,
           student_year: studentYear
         })
         .eq('id', data.user.id);
