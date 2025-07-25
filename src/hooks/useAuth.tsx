@@ -32,7 +32,8 @@ export const useAuth = () => {
 
 // Demo users configuration - more secure approach
 const getDemoUsers = () => {
-  // Use environment-based configuration or server-side validation in production
+  // In production, these should be validated server-side
+  // Using stronger passwords and validation
   return {
     'kayra@demo.com': {
       id: 'demo-student-id',
@@ -41,7 +42,7 @@ const getDemoUsers = () => {
       email: 'kayra@demo.com',
       department: 'Computer Science',
       student_year: '3rd Year',
-      password: '12'
+      password: 'demo123!' // Stronger demo password
     },
     'irmak@demo.com': {
       id: 'demo-professor-id',
@@ -49,7 +50,7 @@ const getDemoUsers = () => {
       role: 'professor' as const,
       email: 'irmak@demo.com',
       department: 'Computer Science',
-      password: '23'
+      password: 'prof456!' // Stronger demo password
     },
     'eylul@demo.com': {
       id: 'demo-dean-id',
@@ -57,15 +58,15 @@ const getDemoUsers = () => {
       role: 'dean' as const,
       email: 'eylul@demo.com',
       department: 'Computer Science',
-      password: '34'
+      password: 'dean789!' // Stronger demo password
     }
   };
 };
 
-// Rate limiting for demo logins
+// Enhanced rate limiting for demo logins
 const demoLoginAttempts = new Map<string, { count: number; lastAttempt: number }>();
-const DEMO_RATE_LIMIT = 5; // Max attempts
-const DEMO_RATE_WINDOW = 5 * 60 * 1000; // 5 minutes
+const DEMO_RATE_LIMIT = 3; // Max attempts (reduced)
+const DEMO_RATE_WINDOW = 15 * 60 * 1000; // 15 minutes (increased)
 
 const checkDemoRateLimit = (email: string): boolean => {
   const now = Date.now();
@@ -98,17 +99,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log('AuthProvider: Setting up auth listener');
-    
     // Check for demo user in localStorage first with session validation
     const demoSession = localStorage.getItem('demoUser');
     if (demoSession) {
       try {
         const parsedSession = JSON.parse(demoSession);
         
-        // Check if demo session has expired
+        // Check if demo session has expired (2 hour timeout)
         if (parsedSession.expiresAt && Date.now() > parsedSession.expiresAt) {
-          console.log('Demo session expired');
           localStorage.removeItem('demoUser');
         } else {
           setUser(parsedSession.user || parsedSession); // Support both old and new format
@@ -116,7 +114,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           return;
         }
       } catch (error) {
-        console.error('Error parsing demo user:', error);
         localStorage.removeItem('demoUser');
       }
     }
@@ -124,8 +121,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('Auth state changed:', event, session?.user?.id);
-        
         setSession(session);
         
         if (session?.user) {
@@ -144,7 +139,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const getInitialSession = async () => {
       try {
         const { data: { session: initialSession } } = await supabase.auth.getSession();
-        console.log('Initial session:', initialSession?.user?.id);
         
         setSession(initialSession);
         
@@ -154,7 +148,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setLoading(false);
         }
       } catch (error) {
-        console.error('Error getting initial session:', error);
         setLoading(false);
       }
     };
@@ -162,15 +155,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     getInitialSession();
 
     return () => {
-      console.log('AuthProvider: Cleaning up auth listener');
       subscription.unsubscribe();
     };
   }, []);
 
   const fetchUserProfile = async (authUser: User) => {
     try {
-      console.log('Fetching profile for user:', authUser.id);
-      
       const { data: profile, error } = await supabase
         .from('profiles')
         .select('*')
@@ -178,12 +168,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         .single();
 
       if (error) {
-        console.error('Error fetching profile:', error);
         throw error;
       }
 
       if (profile) {
-        console.log('Profile found:', profile);
         setUser({
           id: profile.id,
           name: profile.full_name,
@@ -194,7 +182,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         });
       }
     } catch (error) {
-      console.error('Error in fetchUserProfile:', error);
+      // Reduced logging for production security
     } finally {
       setLoading(false);
     }
@@ -210,18 +198,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       throw new Error('Please enter a valid email address');
     }
     
-    console.log('Attempting login for:', email);
-    
-    // Check if this is a demo login with rate limiting
+    // Check if this is a demo login with enhanced security
     const DEMO_USERS = getDemoUsers();
-    const demoUser = DEMO_USERS[email as keyof typeof DEMO_USERS];
-    if (demoUser && demoUser.password === password) {
-      // Apply rate limiting for demo logins
-      if (!checkDemoRateLimit(email)) {
+    const sanitizedEmail = email.trim().toLowerCase();
+    const demoUser = DEMO_USERS[sanitizedEmail as keyof typeof DEMO_USERS];
+    if (demoUser && demoUser.password === password.trim()) {
+      // Apply enhanced rate limiting for demo logins
+      if (!checkDemoRateLimit(sanitizedEmail)) {
         throw new Error('Too many demo login attempts. Please try again later.');
       }
       
-      console.log('Demo login successful');
       const authUser: AuthUser = {
         id: demoUser.id,
         name: demoUser.name,
@@ -231,10 +217,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         student_year: 'student_year' in demoUser ? demoUser.student_year : undefined
       };
       
-      // Set demo session timeout (24 hours)
+      // Set demo session timeout (2 hours)
       const demoSession = {
         user: authUser,
-        expiresAt: Date.now() + (24 * 60 * 60 * 1000)
+        expiresAt: Date.now() + (2 * 60 * 60 * 1000)
       };
       
       setUser(authUser);
@@ -242,18 +228,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
     
-    // Regular Supabase login
+    // Regular Supabase login with sanitized input
     const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password
+      email: sanitizedEmail,
+      password: password.trim()
     });
     
     if (error) {
-      console.error('Login error:', error);
       throw error;
     }
-    
-    console.log('Login successful');
   };
 
   const signup = async (
@@ -286,7 +269,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const sanitizedFullName = fullName.trim();
     const sanitizedDepartment = department?.trim();
     
-    console.log('Attempting signup for:', sanitizedEmail, role);
+    // Removed sensitive logging for production security
     
     const { data, error } = await supabase.auth.signUp({
       email: sanitizedEmail,
@@ -301,12 +284,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
 
     if (error) {
-      console.error('Signup error:', error);
       throw error;
     }
 
     if (data.user) {
-      console.log('User created, updating profile');
+      // Update the profile with additional information
       // Update the profile with additional information
       const { error: profileError } = await supabase
         .from('profiles')
@@ -318,30 +300,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         .eq('id', data.user.id);
 
       if (profileError) {
-        console.error('Profile update error:', profileError);
         throw profileError;
       }
     }
-    
-    console.log('Signup successful');
   };
 
   const logout = async () => {
-    console.log('Attempting logout');
-    
     // Clear demo user if present
     localStorage.removeItem('demoUser');
     
     const { error } = await supabase.auth.signOut();
     if (error) {
-      console.error('Logout error:', error);
       throw error;
     }
     
     setUser(null);
     setSession(null);
-    
-    console.log('Logout successful');
   };
 
   const contextValue: AuthContextType = {

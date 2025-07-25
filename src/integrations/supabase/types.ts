@@ -90,34 +90,34 @@ export type Database = {
       }
       profiles: {
         Row: {
-          created_at: string
+          created_at: string | null
           department: string | null
-          email: string
-          full_name: string
+          email: string | null
+          full_name: string | null
           id: string
-          role: string
+          role: string | null
           student_year: string | null
-          updated_at: string
+          updated_at: string | null
         }
         Insert: {
-          created_at?: string
+          created_at?: string | null
           department?: string | null
-          email: string
-          full_name: string
+          email?: string | null
+          full_name?: string | null
           id: string
-          role: string
+          role?: string | null
           student_year?: string | null
-          updated_at?: string
+          updated_at?: string | null
         }
         Update: {
-          created_at?: string
+          created_at?: string | null
           department?: string | null
-          email?: string
-          full_name?: string
+          email?: string | null
+          full_name?: string | null
           id?: string
-          role?: string
+          role?: string | null
           student_year?: string | null
-          updated_at?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
