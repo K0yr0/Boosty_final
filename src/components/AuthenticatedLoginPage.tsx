@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -48,6 +47,11 @@ const AuthenticatedLoginPage: React.FC = () => {
     }
   };
 
+  const handleDemoLogin = (demoEmail: string, demoPassword: string) => {
+    setEmail(demoEmail);
+    setPassword(demoPassword);
+    setIsLogin(true);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#fff3e6] to-[#ffe0cc] flex items-center justify-center p-4">
@@ -62,6 +66,35 @@ const AuthenticatedLoginPage: React.FC = () => {
           </p>
         </div>
 
+        {/* Demo Credentials Section */}
+        {isLogin && (
+          <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+            <p className="text-sm font-medium text-[#2c2c2c] mb-3">Demo Credentials:</p>
+            <div className="space-y-2">
+              <button
+                type="button"
+                onClick={() => handleDemoLogin('kayra@demo.com', 'demo123!')}
+                className="w-full text-left p-2 text-xs bg-white rounded border hover:bg-gray-100 transition-colors"
+              >
+                <span className="font-medium">Student:</span> kayra@demo.com / demo123!
+              </button>
+              <button
+                type="button"
+                onClick={() => handleDemoLogin('irmak@demo.com', 'prof456!')}
+                className="w-full text-left p-2 text-xs bg-white rounded border hover:bg-gray-100 transition-colors"
+              >
+                <span className="font-medium">Professor:</span> irmak@demo.com / prof456!
+              </button>
+              <button
+                type="button"
+                onClick={() => handleDemoLogin('eylul@demo.com', 'dean789!')}
+                className="w-full text-left p-2 text-xs bg-white rounded border hover:bg-gray-100 transition-colors"
+              >
+                <span className="font-medium">Dean:</span> eylul@demo.com / dean789!
+              </button>
+            </div>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {!isLogin && (

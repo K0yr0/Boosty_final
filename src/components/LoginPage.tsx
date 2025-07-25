@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -93,6 +92,12 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
           </Button>
         </form>
 
+        <div className="mt-6 text-center text-sm text-[#666]">
+          <p>Demo credentials:</p>
+          <p>Student: <span className="font-mono bg-gray-100 px-2 py-1 rounded">kayra / 12</span></p>
+          <p>Professor: <span className="font-mono bg-gray-100 px-2 py-1 rounded">irmak / 23</span></p>
+          <p>Dean: <span className="font-mono bg-gray-100 px-2 py-1 rounded">eylul / 34</span></p>
+        </div>
       </div>
     </div>
   );
