@@ -16,12 +16,31 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Secure login validation - credentials removed for security
-    toast({
-      title: "Login Failed",
-      description: "Invalid credentials. Please use proper authentication.",
-      variant: "destructive",
-    });
+    if (username === 'kayra' && password === '12') {
+      toast({
+        title: "Welcome to Boosty!",
+        description: "Successfully logged in as student",
+      });
+      onLogin({ name: username, role: 'student' });
+    } else if (username === 'irmak' && password === '23') {
+      toast({
+        title: "Welcome Professor!",
+        description: "Successfully logged in as professor",
+      });
+      onLogin({ name: username, role: 'professor' });
+    } else if (username === 'eylul' && password === '34') {
+      toast({
+        title: "Welcome Dean!",
+        description: "Successfully logged in as dean",
+      });
+      onLogin({ name: username, role: 'dean' });
+    } else {
+      toast({
+        title: "Login Failed",
+        description: "Invalid credentials. Try: kayra/12 (student), irmak/23 (professor), or eylul/34 (dean)",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
